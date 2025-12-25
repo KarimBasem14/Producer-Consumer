@@ -68,7 +68,7 @@ public class SimulationService {
     private void restore(SimulationState state) {
         state.getQueueStates().forEach((id, products) -> {
             Queue q = queues.get(id);
-            products.forEach(q::addProductSilently);
+            q.restoreProducts(products);
         });
 
         state.getMachineStates().forEach((id, product) -> {

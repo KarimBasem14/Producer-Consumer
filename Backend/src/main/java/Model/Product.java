@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public class Product {
-    private final String id;
+    private final Long id;
     private final String color;
     private final static String[] colors = {"red","green","yellow","pink","blue","#ffba00", "orange", "purple", "#224B0C" ,"#CE49BF"};
 
-    public Product(String id) {
+    public Product(Long id) {
         this.id = id;
         int min = 0;
         int max = colors.length-1;

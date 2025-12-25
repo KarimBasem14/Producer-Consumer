@@ -13,11 +13,13 @@ public class Queue {
         return new ArrayList<>(products);
     }
 
-    public void addProductSilently(Product p) {
-        products.add(p);
-    }
 
     public void registerObserver(Machine machine) {
         observers.add(machine);
+    }
+
+    public void restoreProducts(List<Product> products) {
+        this.products.clear();
+        this.products.addAll(products);
     }
 }
