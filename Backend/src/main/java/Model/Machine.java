@@ -12,6 +12,7 @@ public class Machine implements Runnable {
     private Queue outputQueue;
     private int processingTime;
     @Getter
+    @Setter
     private Product currentProduct;
 
     public Machine(int processingTime) {

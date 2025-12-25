@@ -70,6 +70,12 @@ public class SimulationService {
             Queue q = queues.get(id);
             products.forEach(q::addProductSilently);
         });
+
+        state.getMachineStates().forEach((id, product) -> {
+            Machine m = machines.get(id);
+            m.setCurrentProduct(product);
+        });
+
     }
 
 
