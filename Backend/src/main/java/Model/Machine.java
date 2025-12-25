@@ -1,4 +1,5 @@
 package Model;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -10,6 +11,8 @@ public class Machine implements Runnable {
     @Setter
     private Queue outputQueue;
     private int processingTime;
+    @Getter
+    private Product currentProduct;
 
     public Machine(int processingTime) {
         this.processingTime = processingTime;
