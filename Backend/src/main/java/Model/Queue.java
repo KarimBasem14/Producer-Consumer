@@ -20,4 +20,8 @@ public class Queue {
     public void registerObserver(Machine machine) {
         observers.add(machine);
     }
+
+    public void addProduct(Product p) {
+        products.add(p);
+    }
 }

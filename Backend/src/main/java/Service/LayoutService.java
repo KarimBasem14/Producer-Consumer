@@ -28,7 +28,7 @@ public class LayoutService {
         queue.x = q.x;
         queue.y = q.y;
         queue.id = ((long)getQueues().size()+1);
-        queues.put(q.getId(), q);
+        queues.put(q.getId(), queue);
         return queue;
     }
 
@@ -57,7 +57,7 @@ public class LayoutService {
         machine.x = m.x;
         machine.y = m.y;
         machine.id = ((long)getMachines().size()+1);
-        machines.put(m.getId(), m);
+        machines.put(m.getId(), machine);
         return machine;
     }
 
