@@ -18,6 +18,12 @@ public class LayoutService {
     private final Map<Long, MachineDTO> machines = new HashMap<>();
     private final Map<Long, ConnectionDTO> connections = new HashMap<>();
 
+    private final SimulationEventListener listener;
+
+    public LayoutService(SimulationEventListener listener) {
+        this.listener = listener;
+    }
+
 
     // Flag to prevent modifications once the simulation is started
     private boolean isLocked = false;
@@ -134,7 +140,7 @@ public class LayoutService {
         });
 
         machines.forEach((id, dto) -> {
-            Machine liveMachine = new Machine(getRandomServiceTime());
+            Machine liveMachine = new Machine(getRandomServiceTime(), listener);
             machinesModels.put(id, liveMachine);
         });
 

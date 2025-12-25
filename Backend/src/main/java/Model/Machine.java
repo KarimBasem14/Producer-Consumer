@@ -1,5 +1,6 @@
 package Model;
 import Observer.Observer;
+import Service.SimulationEventListener;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,7 @@ import java.util.List;
 
 
 public class Machine implements Runnable, Observer {
-    private List<Queue> inputQueues = new ArrayList<Queue>();
+    private List<Queue> inputQueues = new ArrayList<>();
     @Setter
     private Queue outputQueue;
     private int processingTime;
@@ -18,10 +19,13 @@ public class Machine implements Runnable, Observer {
     @Getter
     private Product currentProduct;
 
+    private final SimulationEventListener listener;
+
     private boolean running = true;
 
-    public Machine(int processingTime) {
+    public Machine(int processingTime, SimulationEventListener listener) {
         this.processingTime = processingTime;
+        this.listener = listener;
     }
 
     public void addToInputQueue(Queue inputQueue) {
@@ -33,10 +37,12 @@ public class Machine implements Runnable, Observer {
         while (running) {
             Product product = fetchNextProduct();
             if (product != null) {
+                stateChanged();
                 unregisterFromAllInQueues();
                 process(product);
                 outputQueue.addProduct(product);
                 setCurrentProduct(null);
+                stateChanged();
             }
             else {
                 registerToAllInQueues();
@@ -94,5 +100,9 @@ public class Machine implements Runnable, Observer {
         }catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private void stateChanged() {
+        listener.onStateChanged();
     }
 }

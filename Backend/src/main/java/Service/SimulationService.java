@@ -17,7 +17,7 @@ import java.util.Map;
 
 
 @Service
-public class SimulationService {
+public class SimulationService implements SimulationEventListener {
     private Map<Long, Machine> machines = new HashMap<>();
     private Map<Long, Queue> queues = new HashMap<>();
     List<Thread> machineThreads = new ArrayList<Thread>();
@@ -30,6 +30,11 @@ public class SimulationService {
 
     @Autowired
     private LayoutService layoutService;
+
+    @Override
+    public synchronized void onStateChanged() {
+        takeSnapshot();
+    }
 
     // called by the controller when starting the simulation
     public void start() {
@@ -121,6 +126,7 @@ public class SimulationService {
                 if (q0 != null) {
                     q0.addProduct(p);
                     currentProductCount++;
+                    takeSnapshot();
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
