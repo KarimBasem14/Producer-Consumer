@@ -3,29 +3,48 @@ package Model;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class Queue {
     @Getter
-    private final BlockingQueue<Product> products = new LinkedBlockingQueue<>();
-    private List<Machine> observers = new ArrayList<Machine>();
+    private final List<Product> products = new LinkedList<>();
+    private final List<Machine> observers = new ArrayList<>();
 
-    public List<Product> snapshotProducts() {
+    // Must be synchronized: multiple machines register themselves
+    public synchronized void registerObserver(Machine machine) {
+        if (!observers.contains(machine)) {
+            observers.add(machine);
+        }
+    }
+
+    public synchronized void addProduct(Product p) {
+        products.add(p);
+        notifyObservers();
+    }
+
+    // Synchronized to ensure a product is only polled by one machine thread
+    public synchronized Product pollProduct() {
+        if (products.isEmpty()) {
+            return null;
+        }
+        return products.removeFirst();
+    }
+
+    private synchronized void notifyObservers() {
+        if (!observers.isEmpty()) {
+            Machine machine = observers.removeFirst();
+            synchronized (machine) {
+                machine.notify();
+            }
+        }
+    }
+
+    public synchronized List<Product> snapshotProducts() {
         return new ArrayList<>(products);
     }
 
-
-    public void registerObserver(Machine machine) {
-        observers.add(machine);
-    }
-
-    public void addProduct(Product p) {
-        products.add(p);
-    }
-
-    public void restoreProducts(List<Product> products) {
+    public synchronized void restoreProducts(List<Product> products) {
         this.products.clear();
         this.products.addAll(products);
     }
