@@ -21,7 +21,7 @@ public class SimulationService {
     private Map<Long, Machine> machines = new HashMap<>();
     private Map<Long, Queue> queues = new HashMap<>();
     List<Thread> machineThreads = new ArrayList<Thread>();
-    Thread producer, snapshotTaker;
+    Thread producer;
     boolean running = false;
     private int maxProducts = 20;
     private int currentProductCount = 0;
@@ -52,6 +52,7 @@ public class SimulationService {
         machineThreads.forEach(Thread::interrupt);
         machineThreads.clear();
         layoutService.setLocked(false);
+        producer.interrupt();
     }
 
     // when the user reset the canvas to start a new simulation
@@ -63,6 +64,7 @@ public class SimulationService {
         queues.clear();
         machineThreads.forEach(Thread::interrupt);
         machineThreads.clear();
+        producer.interrupt();
     }
 
     // when the user replay the last simulation
