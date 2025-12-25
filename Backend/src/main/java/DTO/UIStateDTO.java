@@ -5,15 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.Queue;
+import java.util.Map;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SimulationStateDTO {
-    public List<MachineDTO> machines;
-    public List<QueueDTO> queues;
+public class UIStateDTO {
+    public Map<Long, Integer> queuesSize;
+    public Map<Long, String> machinesColor;
+
     public int numOfProducts;
 }

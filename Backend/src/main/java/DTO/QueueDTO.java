@@ -1,15 +1,20 @@
 package DTO;
-
-import Enums.Color;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class QueueDTO {
-    public String id;
-    public Color color;
+    public Long id;
+    public String color;
     public int x;
     public int y;
     public String text;
     int size;
-    public List<String> machines;
 }
