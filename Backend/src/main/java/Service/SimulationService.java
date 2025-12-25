@@ -33,9 +33,7 @@ public class SimulationService {
 
     // called by the controller when starting the simulation
     public void start() {
-        machines.clear();
-        queues.clear();
-        machineThreads.clear();
+        clearSimulationData();
 
         running = true;
         layoutService.setLocked(true);
@@ -59,12 +57,7 @@ public class SimulationService {
     public void resetSimulation(){
         layoutService.setLocked(false);
         layoutService.reset();
-        currentProductCount = 0;
-        machines.clear();
-        queues.clear();
-        machineThreads.forEach(Thread::interrupt);
-        machineThreads.clear();
-        producer.interrupt();
+        clearSimulationData();
     }
 
     // when the user replay the last simulation
@@ -133,6 +126,15 @@ public class SimulationService {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    private void clearSimulationData(){
+        machines.clear();
+        queues.clear();
+        machineThreads.forEach(Thread::interrupt);
+        machineThreads.clear();
+        currentProductCount = 0;
+        producer.interrupt();
     }
 
     public synchronized void takeSnapshot() {
