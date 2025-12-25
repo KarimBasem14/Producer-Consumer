@@ -18,6 +18,10 @@ public class Queue {
         }
     }
 
+    public synchronized void removeObserver(Machine machine) {
+        observers.remove(machine);
+    }
+
     public synchronized void addProduct(Product p) {
         products.add(p);
         notifyObservers();
@@ -32,11 +36,8 @@ public class Queue {
     }
 
     private synchronized void notifyObservers() {
-        if (!observers.isEmpty()) {
-            Machine machine = observers.removeFirst();
-            synchronized (machine) {
-                machine.notify();
-            }
+        for (Machine m : observers) {
+            m.update();
         }
     }
 
@@ -48,4 +49,6 @@ public class Queue {
         this.products.clear();
         this.products.addAll(products);
     }
+
+
 }
