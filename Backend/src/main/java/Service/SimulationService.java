@@ -1,4 +1,5 @@
 package Service;
+import DTO.UIStateDTO;
 import Model.Machine;
 import Model.Product;
 import Model.Queue;
@@ -30,13 +31,76 @@ public class SimulationService {
     @Autowired
     private LayoutService layoutService;
 
+    // called by the controller when starting the simulation
     public void start() {
+        machines.clear();
+        queues.clear();
+        machineThreads.clear();
+
         running = true;
         layoutService.setLocked(true);
         machines.clear();
         queues.clear();
         layoutService.setUpSimulation(machines, queues);
         startThreads();
+    }
+
+
+    // called by the controller when stopping the simulation
+    public void stop() {
+        this.running = false;
+        machineThreads.forEach(Thread::interrupt);
+        machineThreads.clear();
+        layoutService.setLocked(false);
+    }
+
+    // when the user reset the canvas to start a new simulation
+    public void resetSimulation(){
+        layoutService.setLocked(false);
+        layoutService.reset();
+        currentProductCount = 0;
+        machines.clear();
+        queues.clear();
+        machineThreads.forEach(Thread::interrupt);
+        machineThreads.clear();
+    }
+
+    // when the user replay the last simulation
+    public void replay() throws InterruptedException {
+        stop();
+        List<SimulationState> history = snapshotManager.getAll();
+
+        for (int i = 0; i < history.size(); i++) {
+            restore(history.get(i));
+
+            if (i > 0) {
+                long delay =
+                        history.get(i).getTimestamp()
+                                - history.get(i - 1).getTimestamp();
+
+                Thread.sleep(delay);
+            }
+        }
+    }
+
+    // getting the current state (polling every 200ms) to update the UI
+    public UIStateDTO getCurrentState() {
+        UIStateDTO uiStateDTO = new UIStateDTO();
+
+        // mapping machines to a map of product id and color
+        // if the machine product is null the default machine color is white
+        for (Map.Entry<Long, Machine> m : machines.entrySet()) {
+            if(m.getValue().getCurrentProduct()!=null)
+                uiStateDTO.machinesColor.put(m.getKey(), m.getValue().getCurrentProduct().getColor());
+            else uiStateDTO.machinesColor.put(m.getKey(), "white");
+        }
+
+        // mapping queues to a map of id and size (size of current products in the queue)
+        for(Map.Entry<Long, Queue> q : queues.entrySet()) {
+            uiStateDTO.queuesSize.put(q.getKey(), q.getValue().getProducts().size());
+        }
+
+        return uiStateDTO;
     }
 
     private void startThreads(){
@@ -51,29 +115,23 @@ public class SimulationService {
     }
 
     private void generateProducts() {
-
         while (currentProductCount < maxProducts && running && !Thread.currentThread().isInterrupted()) {
             try {
-
                 int min = 1;
                 int max = 5;
                 int randomTime = (int)Math.floor(Math.random() *(max - min + 1) + min);
                 Thread.sleep(randomTime);
-
                 Product p = new Product((long)currentProductCount);
-
                 Queue q0 = queues.get(1L);
                 if (q0 != null) {
                     q0.addProduct(p);
                     currentProductCount++;
                 }
-
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
     }
-
 
     public synchronized void takeSnapshot() {
         Map<Long, List<Product>> qSnap = new HashMap<>();
@@ -90,24 +148,6 @@ public class SimulationService {
         );
     }
 
-    public void replay() throws InterruptedException {
-//        stop();
-
-        List<SimulationState> history = snapshotManager.getAll();
-
-        for (int i = 0; i < history.size(); i++) {
-            restore(history.get(i));
-
-            if (i > 0) {
-                long delay =
-                        history.get(i).getTimestamp()
-                                - history.get(i - 1).getTimestamp();
-
-                Thread.sleep(delay);
-            }
-        }
-    }
-
     private void restore(SimulationState state) {
         state.getQueueStates().forEach((id, products) -> {
             Queue q = queues.get(id);
@@ -120,7 +160,5 @@ public class SimulationService {
         });
 
     }
-
-
 
 }

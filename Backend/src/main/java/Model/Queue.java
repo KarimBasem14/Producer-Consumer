@@ -1,11 +1,14 @@
 package Model;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Queue {
+    @Getter
     private final BlockingQueue<Product> products = new LinkedBlockingQueue<>();
     private List<Machine> observers = new ArrayList<Machine>();
 

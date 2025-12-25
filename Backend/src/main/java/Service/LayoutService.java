@@ -27,6 +27,7 @@ public class LayoutService {
         QueueDTO queue = new QueueDTO();
         queue.x = q.x;
         queue.y = q.y;
+        queue.color = "white";
         queue.id = ((long)getQueues().size()+1);
         queues.put(q.getId(), queue);
         return queue;
@@ -56,6 +57,7 @@ public class LayoutService {
         MachineDTO machine = new MachineDTO();
         machine.x = m.x;
         machine.y = m.y;
+        machine.color = "white";
         machine.id = ((long)getMachines().size()+1);
         machines.put(m.getId(), machine);
         return machine;

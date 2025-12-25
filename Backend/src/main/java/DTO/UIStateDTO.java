@@ -14,6 +14,4 @@ import java.util.Map;
 public class UIStateDTO {
     public Map<Long, Integer> queuesSize;
     public Map<Long, String> machinesColor;
-
-    public int numOfProducts;
 }
