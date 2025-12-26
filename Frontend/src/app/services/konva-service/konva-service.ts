@@ -4,39 +4,38 @@ import Konva from 'konva';
 @Injectable({ providedIn: 'root' })
 export class KonvaService {
   /*
-  * This service is used to deal with drawing things on the canvas.
-  * This "drawing" involves actually drawing it using Konva, and sending a request to the backend
-  */
-
+   * This service is used to deal with drawing things on the canvas.
+   * This "drawing" involves actually drawing it using Konva, and sending a request to the backend
+   */
 
   private stage!: Konva.Stage; // Our canvas
   private layer!: Konva.Layer; // A stage/canvas needs a layer to do draw on
 
   initialize(container: string) {
     /*
-    * Initializes the stage for konva.
-    *
-    */
+     * Initializes the stage for konva.
+     *
+     */
     this.stage = new Konva.Stage({
       container,
       width: window.innerWidth - 260,
-      height: window.innerHeight - 64
+      height: window.innerHeight - 64,
     });
     this.layer = new Konva.Layer();
     this.stage.add(this.layer);
   }
 
   // Draw a machine (circle)
-  drawMachine() {
+  drawMachine(id: string, x: number, y: number, color: string = '#4A90E2') {
     const circle = new Konva.Circle({
-
-      x: 100,
-      y: 100,
+      id,
+      x,
+      y,
       radius: 30,
-      fill: "white",
+      fill: color,
       stroke: 'black',
       strokeWidth: 2,
-      draggable: true
+      draggable: true,
     });
     this.layer.add(circle);
     this.layer.draw();
@@ -55,7 +54,7 @@ export class KonvaService {
       fill: color,
       stroke: 'black',
       strokeWidth: 2,
-      draggable: true
+      draggable: true,
     });
     this.layer.add(rect);
     this.layer.draw();
@@ -71,7 +70,7 @@ export class KonvaService {
       stroke: 'black',
       strokeWidth: 2,
       lineCap: 'round',
-      lineJoin: 'round'
+      lineJoin: 'round',
     });
     this.layer.add(line);
     this.layer.draw();
