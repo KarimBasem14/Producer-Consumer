@@ -43,7 +43,7 @@ export class KonvaService {
   }
 
   // Draw a queue (rectangle)
-  drawQueue(id: string, x: number, y: number, color: string = '#E8B84A') {
+  drawQueue(id: string, x: number, y: number, color: string = '#fff') {
     const rect = new Konva.Rect({
       id,
       x,
