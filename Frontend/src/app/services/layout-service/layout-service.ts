@@ -22,6 +22,7 @@ export class LayoutService {
   private readonly SHIFT_STEP = 40;
   private machineCounter = 0;
   private queueCounter = 0;
+  private connectionCounter = 0;
 
   addMachine() {
     const initialData = {
@@ -57,9 +58,9 @@ export class LayoutService {
     });
   }
 
-  updateMachinePosition(id: string, x: number, y: number) {
+  updateMachinePosition(id: number, x: number, y: number) {
     const payload = {
-      id: Number(id),
+      id: id,
       x: Math.round(x),
       y: Math.round(y),
       color: 'white',
@@ -78,8 +79,8 @@ export class LayoutService {
       });
   }
 
-  updateQueuePosition(id: string, x: number, y: number) {
-    const payload = { id: Number(id), x: Math.round(x), y: Math.round(y), size: 0 };
+  updateQueuePosition(id: number, x: number, y: number) {
+    const payload = { id: id, x: Math.round(x), y: Math.round(y), size: 0 };
 
     this.http
       .put(`${this.API_BASE}/queues/update`, payload, {
@@ -144,33 +145,37 @@ export class LayoutService {
         direction: sourceType === 'machine' ? 0 : 1,
       };
 
-      this.http.post<Connection>(`${this.API_BASE}/connections/add`, dto).subscribe({
-        next: (conn) =>
-          this.konva.drawConnection(conn.id, sourceId, sourceType, targetId, targetType),
-        error: (err) => console.error('Connection rejected by backend', err),
-      });
+      this.http
+        .post(`${this.API_BASE}/connections/add`, dto, { responseType: 'text' })
+        .subscribe({
+          next: () => {
+            const arrowId = `link-${this.connectionCounter}-${sourceType}-${sourceId}-${targetType}-${targetId}`;
+            this.connectionCounter++;
+
+            this.konva.drawConnection(arrowId, sourceId, sourceType, targetId, targetType);
+          },
+          error: (err) => console.error('Connection rejected by backend', err),
+        });
     }
   }
 
   deleteComponent(id: number, type: 'machine' | 'queue' | 'connection') {
     if (type === 'machine') {
       this.http
-      .delete(`${this.API_BASE}/machines/delete/${id}`, { responseType: 'text' })
-      .subscribe({
-        next: () => this.konva.removeNode(id.toString()),
-        error: (err) => console.error('Failed to delete machine', err),
-      });
+        .delete(`${this.API_BASE}/machines/delete/${id}`, { responseType: 'text' })
+        .subscribe({
+          next: () => this.konva.removeNode(`machine-${id}`),
+          error: (err) => console.error('Failed to delete machine', err),
+        });
     }
 
     if (type === 'queue') {
-    this.http
-      .delete(`${this.API_BASE}/queues/delete/${id}`, { responseType: 'text' })
-      .subscribe({
-        next: () => this.konva.removeNode(id.toString()),
+      this.http.delete(`${this.API_BASE}/queues/delete/${id}`, { responseType: 'text' }).subscribe({
+        next: () => this.konva.removeNode(`queue-${id}`),
         error: (err) => console.error('Failed to delete queue', err),
       });
+    }
   }
-}
   private connectionExists(id1: number, type1: string, id2: number, type2: string): boolean {
     const patternA = `${type1}-${id1}`;
     const patternB = `${type2}-${id2}`;
@@ -180,7 +185,6 @@ export class LayoutService {
       return arrowId.includes(patternA) && arrowId.includes(patternB);
     });
   }
-
 
   clearAll() {
     this.http.delete(`${this.API_BASE}/clear`).subscribe(() => {

@@ -28,7 +28,7 @@ export class KonvaService {
 
   drawMachine(dto: Machine, counter: number) {
     const group = new Konva.Group({
-      id: dto.id.toString(),
+      id: `machine-${dto.id}`,
       x: dto.x,
       y: dto.y,
       draggable: true,
@@ -66,7 +66,7 @@ export class KonvaService {
 
     group.on('dragend', () => {
       const layoutService = this.injector.get(LayoutService);
-      layoutService.updateMachinePosition(group.id(), group.x(), group.y());
+      layoutService.updateMachinePosition(dto.id, group.x(), group.y());
     });
 
     group.add(circle, label);
@@ -76,7 +76,7 @@ export class KonvaService {
 
   drawQueue(dto: any, counter: number) {
     const group = new Konva.Group({
-      id: dto.id.toString(),
+      id: `queue-${dto.id}`,
       x: dto.x,
       y: dto.y,
       draggable: true,
@@ -115,21 +115,24 @@ export class KonvaService {
     this.addClickEvents(group, dto.id, 'queue');
     group.on('dragend', () => {
       const layoutService = this.injector.get(LayoutService);
-      layoutService.updateQueuePosition(group.id(), group.x(), group.y());
+      layoutService.updateQueuePosition(dto.id, group.x(), group.y());
     });
 
     this.layer.add(group);
     this.layer.draw();
   }
   drawConnection(
-    id: number,
+    id: string,
     fromId: number,
     sourceType: 'machine' | 'queue',
     toId: number,
     targetType: 'machine' | 'queue'
   ) {
-    const fromNode = this.stage.find(`.${sourceType}`).find((n) => n.id() === fromId.toString());
-    const toNode = this.stage.find(`.${targetType}`).find((n) => n.id() === toId.toString());
+    // const fromNode = this.stage.find(`.${sourceType}`).find((n) => n.id() === fromId.toString());
+    // const toNode = this.stage.find(`.${targetType}`).find((n) => n.id() === toId.toString());
+const fromNode = this.stage.findOne(`#${sourceType}-${fromId}`);
+const toNode   = this.stage.findOne(`#${targetType}-${toId}`);
+
 
     if (!fromNode || !toNode) return;
 
