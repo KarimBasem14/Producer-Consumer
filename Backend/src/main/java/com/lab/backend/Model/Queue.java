@@ -1,12 +1,13 @@
 package com.lab.backend.Model;
 
+import com.lab.backend.Observer.Subject;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Queue {
+public class Queue implements Subject {
     @Getter
     private final List<Product> products = new LinkedList<>();
     private final List<Machine> observers = new ArrayList<>();
@@ -35,7 +36,8 @@ public class Queue {
         return products.removeFirst();
     }
 
-    private synchronized void notifyObservers() {
+    @Override
+    public synchronized void notifyObservers() {
         for (Machine m : observers) {
             m.update();
         }
