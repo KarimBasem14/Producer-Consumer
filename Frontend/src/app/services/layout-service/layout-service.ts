@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { KonvaService } from '../konva-service/konva-service';
 import { SignalZero } from 'lucide-angular';
 import { first } from 'rxjs';
+import { Connection } from '../../models/Connection.model';
+import Konva from 'konva';
 
 @Injectable({
   providedIn: 'root',
@@ -116,6 +118,11 @@ export class LayoutService {
       this.firstSelectedId = null;
       this.firstSelectedType = null;
 
+      if (!sourceType || !targetType) {
+        console.log('Invalid source or target type.');
+        return;
+      }
+
       if (sourceType === targetType) {
         console.log('Cannot connect two components of the same type.');
         return;
@@ -126,8 +133,8 @@ export class LayoutService {
         return;
       }
 
-      if (!sourceType || !targetType) {
-        console.log('Invalid source or target type.');
+      if (this.connectionExists(sourceId, sourceType, targetId, targetType)) {
+        console.log('A connection already exists between these components!');
         return;
       }
 
@@ -137,11 +144,22 @@ export class LayoutService {
         direction: sourceType === 'machine' ? 0 : 1,
       };
 
-      this.http.post(`${this.API_BASE}/connections/add`, dto, { responseType: 'text' }).subscribe({
-        next: () => this.konva.drawConnection(sourceId, sourceType, targetId, targetType),
+      this.http.post<Connection>(`${this.API_BASE}/connections/add`, dto).subscribe({
+        next: (conn) =>
+          this.konva.drawConnection(conn.id, sourceId, sourceType, targetId, targetType),
         error: (err) => console.error('Connection rejected by backend', err),
       });
     }
+  }
+
+  private connectionExists(id1: number, type1: string, id2: number, type2: string): boolean {
+    const patternA = `${type1}-${id1}`;
+    const patternB = `${type2}-${id2}`;
+    const allArrows = this.konva.findShapeBySelector('Arrow') as unknown as Konva.Node[];
+    return allArrows.some((arrow) => {
+      const arrowId = arrow.id();
+      return arrowId.includes(patternA) && arrowId.includes(patternB);
+    });
   }
 
   deleteComponent(id: number) {

@@ -1,5 +1,6 @@
 import { inject, Injectable, Injector, signal } from '@angular/core';
 import Konva from 'konva';
+
 import { LayoutService } from '../layout-service/layout-service';
 import { Machine } from '../../models/Machine.model';
 
@@ -121,6 +122,7 @@ export class KonvaService {
     this.layer.draw();
   }
   drawConnection(
+    id: number,
     fromId: number,
     sourceType: 'machine' | 'queue',
     toId: number,
@@ -132,11 +134,9 @@ export class KonvaService {
     if (!fromNode || !toNode) return;
 
     const updatePoints = () => {
-      // 1. Get centers
       const c1 = this.getCenter(fromNode, sourceType);
       const c2 = this.getCenter(toNode, targetType);
 
-      // 2. Calculate edge points
       const start = this.getEdgePoint(c1, c2, sourceType);
       const end = this.getEdgePoint(c2, c1, targetType);
 
@@ -144,7 +144,6 @@ export class KonvaService {
       this.layer.batchDraw();
     };
 
-    // Initial calculation
     const c1 = this.getCenter(fromNode, sourceType);
     const c2 = this.getCenter(toNode, targetType);
     const start = this.getEdgePoint(c1, c2, sourceType);
@@ -157,7 +156,7 @@ export class KonvaService {
       fill: '#475569',
       stroke: '#475569',
       strokeWidth: 3,
-      id: `link-${sourceType}-${fromId}-${targetType}-${toId}`,
+      id: `link-${id}-${sourceType}-${fromId}-${targetType}-${toId}`,
     });
 
     fromNode.on('dragmove', updatePoints);
@@ -208,6 +207,10 @@ export class KonvaService {
         y: from.y + distance * Math.sin(angle),
       };
     }
+  }
+
+  findShapeBySelector(selector: string): any {
+    return this.stage.find(selector);
   }
 
   private addClickEvents(group: Konva.Group, id: number, type: 'machine' | 'queue' | 'connection') {
