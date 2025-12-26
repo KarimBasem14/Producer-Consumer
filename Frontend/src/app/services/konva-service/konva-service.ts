@@ -218,4 +218,13 @@ export class KonvaService {
       layout.handleInteraction(id, currentMode, type);
     });
   }
+
+  removeNode(id: string) {
+  const node = this.layer.findOne(`#${id}`);
+  if (!node) return;
+
+  node.destroy();
+  this.layer.draw();
+}
+
 }

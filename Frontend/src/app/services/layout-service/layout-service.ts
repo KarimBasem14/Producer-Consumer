@@ -95,7 +95,7 @@ export class LayoutService {
 
   handleInteraction(id: number, currentMode: string, type: 'machine' | 'queue' | 'connection') {
     if (currentMode === 'delete') {
-      this.deleteComponent(id);
+      this.deleteComponent(id, type);
     } else if (currentMode === 'connect') {
       this.handleConnectFlow(id, type);
     }
@@ -144,8 +144,24 @@ export class LayoutService {
     }
   }
 
-  deleteComponent(id: number) {
-    // Nour :) Smile
+  deleteComponent(id: number, type: 'machine' | 'queue' | 'connection') {
+    if (type === 'machine') {
+      this.http
+      .delete(`${this.API_BASE}/machines/delete/${id}`, { responseType: 'text' })
+      .subscribe({
+        next: () => this.konva.removeNode(id.toString()),
+        error: (err) => console.error('Failed to delete machine', err),
+      });
+    }
+
+    if (type === 'queue') {
+    this.http
+      .delete(`${this.API_BASE}/queues/delete/${id}`, { responseType: 'text' })
+      .subscribe({
+        next: () => this.konva.removeNode(id.toString()),
+        error: (err) => console.error('Failed to delete queue', err),
+      });
+  }
   }
 
   clearAll() {
