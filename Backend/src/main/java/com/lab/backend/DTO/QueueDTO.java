@@ -14,6 +14,5 @@ public class QueueDTO {
     public Long id;
     public int x;
     public int y;
-    public String text;
     int size;
 }

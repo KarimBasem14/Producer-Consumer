@@ -15,5 +15,5 @@ public class MachineDTO {
     public String color;
     public int x;
     public int y;
-    public String text;
+
 }

@@ -2,6 +2,8 @@ package com.lab.backend.Service;
 import com.lab.backend.Model.Machine;
 import com.lab.backend.Model.Queue;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import com.lab.backend.DTO.ConnectionDTO;
 import com.lab.backend.DTO.MachineDTO;
@@ -20,7 +22,8 @@ public class LayoutService {
 
     private final SimulationEventListener listener;
 
-    public LayoutService(SimulationEventListener listener) {
+    @Autowired
+    public LayoutService(@Lazy SimulationEventListener listener) {
         this.listener = listener;
     }
 
@@ -34,7 +37,7 @@ public class LayoutService {
         queue.x = q.x;
         queue.y = q.y;
         queue.id = ((long)getQueues().size()+1);
-        queues.put(q.getId(), queue);
+        queues.put(queue.getId(), queue);
         return queue;
     }
 
@@ -64,7 +67,7 @@ public class LayoutService {
         machine.y = m.y;
         machine.color = "white";
         machine.id = ((long)getMachines().size()+1);
-        machines.put(m.getId(), machine);
+        machines.put(machine.getId(), machine);
         return machine;
     }
 
