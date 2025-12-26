@@ -1,0 +1,50 @@
+.top-bar {
+  height: 4rem; /* h-16 */
+  background-color: hsl(var(--card));
+  border-bottom: 1px solid hsl(var(--border));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.button-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: hsl(var(--secondary));
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+}
+
+.divider {
+  height: 2rem;
+  width: 1px;
+  background-color: hsl(var(--border));
+}
+
+.pause-btn {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+.pause-btn:hover {
+  filter: brightness(1.1);
+}
+
+.snapshot-info {
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }

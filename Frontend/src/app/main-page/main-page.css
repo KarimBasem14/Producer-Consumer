@@ -1,0 +1,27 @@
+.main-layout {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Prevents unwanted scrollbars during simulation */
+  background-color: hsl(var(--background));
+}
+
+.simulation-area {
+  flex: 1; /* This makes the canvas occupy all remaining space */
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Optional: Add a subtle transition if you decide to hide the sidebar later */
+app-sidebar {
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+app-canvas {
+  width: 100%;
+  height: 100%;
+}

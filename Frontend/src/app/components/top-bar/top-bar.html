@@ -1,0 +1,71 @@
+<div class="top-bar">
+  <div class="control-group">
+    <div class="button-strip">
+      @if (simService.status() !== 'running') {
+        <button (click)="startSimulation()" class="control-btn control-btn-success"
+                [disabled]="simService.queues().length === 0">
+          <lucide-icon [name]="Play" size="16"></lucide-icon>
+          <span>Start</span>
+        </button>
+      } @else {
+        <button (click)="pauseSimulation()" class="control-btn pause-btn">
+          <lucide-icon [name]="Pause" size="16"></lucide-icon>
+          <span>Pause</span>
+        </button>
+      }
+
+      <button (click)="stopSimulation()" class="control-btn control-btn-secondary"
+              [disabled]="simService.status() === 'stopped'">
+        <lucide-icon [name]="Square" size="16"></lucide-icon>
+        <span>Stop</span>
+      </button>
+
+      <button (click)="resetSimulation()" class="control-btn control-btn-secondary">
+        <lucide-icon [name]="RotateCcw" size="16"></lucide-icon>
+        <span>Reset</span>
+      </button>
+    </div>
+
+    <div class="divider"></div>
+
+    <button (click)="handleAddProducts()" class="control-btn control-btn-primary"
+            [disabled]="simService.queues().length === 0">
+      <lucide-icon [name]="Plus" size="16"></lucide-icon>
+      <span>Add Products</span>
+    </button>
+  </div>
+
+  <div class="status-container">
+    <div class="status-badge" [class]="'status-' + simService.status()">
+      {{ simService.status().toUpperCase() }}
+    </div>
+  </div>
+
+  <div class="control-group">
+    <button (click)="saveSnapshot()" class="control-btn control-btn-secondary">
+      <lucide-icon [name]="Save" size="16"></lucide-icon>
+      <span>Snapshot</span>
+    </button>
+
+    @if (snapshots().length > 0) {
+      <div class="button-strip">
+        <button (click)="loadSnapshot(currentSnapshotIndex() - 1)"
+                class="control-btn control-btn-secondary px-2"
+                [disabled]="currentSnapshotIndex() <= 0">
+          <lucide-icon [name]="ChevronLeft" size="16"></lucide-icon>
+        </button>
+
+        <div class="snapshot-info font-mono">
+          <lucide-icon [name]="History" size="14"></lucide-icon>
+          {{ currentSnapshotIndex() + 1 }} / {{ snapshots().length }}
+        </div>
+
+        <button (click)="loadSnapshot(currentSnapshotIndex() + 1)"
+                class="control-btn control-btn-secondary px-2"
+                [disabled]="currentSnapshotIndex() >= snapshots().length - 1">
+          <lucide-icon [name]="ChevronRight" size="16"></lucide-icon>
+        </button>
+      </div>
+    }
+  </div>
+</div>

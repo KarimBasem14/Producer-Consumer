@@ -1,0 +1,118 @@
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background-color: hsl(var(--sidebar-background));
+  border-right: 1px solid hsl(var(--sidebar-border));
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid hsl(var(--sidebar-border));
+}
+
+.sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: hsl(var(--primary));
+  border-radius: 50%;
+}
+
+.sidebar-subtitle {
+  font-size: 0.7rem;
+  color: hsl(var(--muted-foreground));
+  margin-top: 4px;
+}
+
+.sidebar-section {
+  padding: 1rem;
+  border-bottom: 1px solid hsl(var(--sidebar-border));
+}
+
+.section-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 0.75rem;
+}
+
+.button-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: hsl(var(--sidebar-foreground));
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.sidebar-item:hover {
+  background-color: hsl(var(--sidebar-accent));
+}
+
+.sidebar-item.active {
+  background-color: hsl(var(--sidebar-accent));
+  color: hsl(var(--primary));
+}
+
+.delete-mode:hover {
+  color: hsl(var(--destructive));
+}
+
+.icon-container {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.machine-icon { background: hsl(var(--primary) / 0.15); color: hsl(var(--primary)); }
+.queue-icon { background: hsl(var(--sidebar-foreground) / 0.1); }
+
+.item-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-label { font-size: 0.85rem; font-weight: 500; }
+.item-desc { font-size: 0.7rem; color: hsl(var(--muted-foreground)); }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 1rem;
+}
+
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+}

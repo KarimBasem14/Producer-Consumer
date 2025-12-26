@@ -1,0 +1,81 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1 class="sidebar-title">
+      <div class="status-dot animate-pulse-glow"></div>
+      Assembly Line
+    </h1>
+    <p class="sidebar-subtitle font-mono">
+      Producer/Consumer Simulation
+    </p>
+  </div>
+
+  <div class="sidebar-section">
+    <h2 class="section-label">Add Components</h2>
+    <div class="button-list">
+      <button (click)="onAddMachine()" class="sidebar-item">
+        <div class="icon-container machine-icon">
+          <lucide-icon [name]="Circle" size="16"></lucide-icon>
+        </div>
+        <div class="item-text">
+          <span class="item-label">Machine</span>
+          <span class="item-desc">Process products</span>
+        </div>
+        <lucide-icon [name]="Plus" size="16" class="muted"></lucide-icon>
+      </button>
+
+      <button (click)="onAddQueue()" class="sidebar-item">
+        <div class="icon-container queue-icon">
+          <lucide-icon [name]="Square" size="16"></lucide-icon>
+        </div>
+        <div class="item-text">
+          <span class="item-label">Queue</span>
+          <span class="item-desc">Store products</span>
+        </div>
+        <lucide-icon [name]="Plus" size="16" class="muted"></lucide-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <h2 class="section-label">Edit Mode</h2>
+    <div class="button-list">
+      @let mode = editMode();
+
+      <button (click)="onSetMode('select')"
+              [class.active]="mode === 'select'" class="sidebar-item">
+        <lucide-icon [name]="MousePointer" size="16"></lucide-icon>
+        <span>Select & Move</span>
+      </button>
+
+      <button (click)="onSetMode('connect')"
+              [class.active]="mode === 'connect'" class="sidebar-item">
+        <lucide-icon [name]="Link" size="16"></lucide-icon>
+        <span>Connect</span>
+      </button>
+
+      <button (click)="onSetMode('delete')"
+              [class.active]="mode === 'delete'" class="sidebar-item delete-mode">
+        <lucide-icon [name]="Trash2" size="16"></lucide-icon>
+        <span>Delete</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <h2 class="section-label">Statistics</h2>
+    <div class="stats-list font-mono">
+      <div class="stat-row">
+        <span>Machines</span>
+        <span>{{ machines().length }}</span>
+      </div>
+      <div class="stat-row">
+        <span>Queues</span>
+        <span>{{ queues().length }}</span>
+      </div>
+      <div class="stat-row">
+        <span>Products</span>
+        <span>{{ totalProducts() }}</span>
+      </div>
+    </div>
+  </div>
+</aside>
