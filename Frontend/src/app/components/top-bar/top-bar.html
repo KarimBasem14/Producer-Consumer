@@ -2,25 +2,25 @@
   <div class="control-group">
     <div class="button-strip">
       @if (simService.status() !== 'running') {
-        <button (click)="simService.startSimulation()" class="control-btn control-btn-success"
+        <button (click)="startSimulation()" class="control-btn control-btn-success"
                 [disabled]="simService.queues().length === 0">
           <lucide-icon [name]="Play" size="16"></lucide-icon>
           <span>Start</span>
         </button>
       } @else {
-        <button (click)="simService.pauseSimulation()" class="control-btn pause-btn">
+        <button (click)="pauseSimulation()" class="control-btn pause-btn">
           <lucide-icon [name]="Pause" size="16"></lucide-icon>
           <span>Pause</span>
         </button>
       }
 
-      <button (click)="simService.stopSimulation()" class="control-btn control-btn-secondary"
+      <button (click)="stopSimulation()" class="control-btn control-btn-secondary"
               [disabled]="simService.status() === 'stopped'">
         <lucide-icon [name]="Square" size="16"></lucide-icon>
         <span>Stop</span>
       </button>
 
-      <button (click)="simService.resetSimulation()" class="control-btn control-btn-secondary">
+      <button (click)="resetSimulation()" class="control-btn control-btn-secondary">
         <lucide-icon [name]="RotateCcw" size="16"></lucide-icon>
         <span>Reset</span>
       </button>
@@ -42,27 +42,27 @@
   </div>
 
   <div class="control-group">
-    <button (click)="simService.saveSnapshot()" class="control-btn control-btn-secondary">
+    <button (click)="saveSnapshot()" class="control-btn control-btn-secondary">
       <lucide-icon [name]="Save" size="16"></lucide-icon>
       <span>Snapshot</span>
     </button>
 
-    @if (simService.snapshots().length > 0) {
+    @if (snapshots().length > 0) {
       <div class="button-strip">
-        <button (click)="simService.loadSnapshot(simService.currentSnapshotIndex() - 1)"
+        <button (click)="loadSnapshot(currentSnapshotIndex() - 1)"
                 class="control-btn control-btn-secondary px-2"
-                [disabled]="simService.currentSnapshotIndex() <= 0">
+                [disabled]="currentSnapshotIndex() <= 0">
           <lucide-icon [name]="ChevronLeft" size="16"></lucide-icon>
         </button>
 
         <div class="snapshot-info font-mono">
           <lucide-icon [name]="History" size="14"></lucide-icon>
-          {{ simService.currentSnapshotIndex() + 1 }} / {{ simService.snapshots().length }}
+          {{ currentSnapshotIndex() + 1 }} / {{ snapshots().length }}
         </div>
 
-        <button (click)="simService.loadSnapshot(simService.currentSnapshotIndex() + 1)"
+        <button (click)="loadSnapshot(currentSnapshotIndex() + 1)"
                 class="control-btn control-btn-secondary px-2"
-                [disabled]="simService.currentSnapshotIndex() >= simService.snapshots().length - 1">
+                [disabled]="currentSnapshotIndex() >= snapshots().length - 1">
           <lucide-icon [name]="ChevronRight" size="16"></lucide-icon>
         </button>
       </div>

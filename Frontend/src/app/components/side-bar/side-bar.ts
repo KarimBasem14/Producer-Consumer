@@ -21,6 +21,7 @@ export class SideBar {
   public machines = this.simService.machines;
   public queues = this.simService.queues;
   public connections = this.simService.connections;
+  public totalProducts = this.simService.totalProducts;
 
   // Icons mapping
   readonly Circle = Circle;
@@ -31,19 +32,16 @@ export class SideBar {
   readonly Plus = Plus;
 
   onAddMachine() {
-    this.simService.addMachine();
+    // TODO: Implement machine addition logic
+    // This would update the state through updateState()
   }
 
   onAddQueue() {
-    this.simService.addQueue();
+    // TODO: Implement queue addition logic
+    // This would update the state through updateState()
   }
 
   onSetMode(mode: 'select' | 'connect' | 'delete') {
     this.simService.setEditMode(mode);
-  }
-
-  // Computed value logic for total products
-  get totalProducts(): number {
-    return this.queues().reduce((acc, q) => acc + (q.products?.length || 0), 0);
   }
 }

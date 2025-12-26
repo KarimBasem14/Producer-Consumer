@@ -1,5 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {SimulationService} from '../../services/simulation-service/simulation-service';
+import {SnapshotService} from '../../services/snapshot-service/snapshot-service';
 import {
   LucideAngularModule, Play, Pause, Square, RotateCcw,
   Save, History, Plus, ChevronLeft, ChevronRight
@@ -13,13 +14,47 @@ import {
 })
 export class TopBar {
   public simService = inject(SimulationService);
+  private snapshotService = inject(SnapshotService);
 
   // Icon Mappings
   readonly Play = Play; readonly Pause = Pause; readonly Square = Square;
   readonly RotateCcw = RotateCcw; readonly Save = Save; readonly History = History;
   readonly Plus = Plus; readonly ChevronLeft = ChevronLeft; readonly ChevronRight = ChevronRight;
 
+  // Expose snapshot signals to template
+  public snapshots = this.snapshotService.history;
+  public currentSnapshotIndex = this.snapshotService.currentIndex;
+
+  startSimulation() {
+    this.simService.start();
+  }
+
+  pauseSimulation() {
+    this.simService.pause();
+  }
+
+  stopSimulation() {
+    this.simService.stop();
+  }
+
+  resetSimulation() {
+    this.simService.reset();
+  }
+
+  saveSnapshot() {
+    const currentState = {
+      machines: this.simService.machines(),
+      queues: this.simService.queues(),
+      connections: this.simService.connections()
+    };
+    this.snapshotService.takeSnapshot(currentState);
+  }
+
+  loadSnapshot(index: number) {
+    this.simService.handleReplay(index);
+  }
+
   handleAddProducts() {
-    // Logic to trigger random product arrival at Q0
+    // TODO: Logic to trigger random product arrival at Q0
   }
 }
