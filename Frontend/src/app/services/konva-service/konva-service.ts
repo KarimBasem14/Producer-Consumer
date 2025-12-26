@@ -120,44 +120,38 @@ export class KonvaService {
     this.layer.add(group);
     this.layer.draw();
   }
-
   drawConnection(
     fromId: number,
     sourceType: 'machine' | 'queue',
     toId: number,
     targetType: 'machine' | 'queue'
   ) {
-    // 1. Find the nodes using the safer find() method to handle ID collisions
     const fromNode = this.stage.find(`.${sourceType}`).find((n) => n.id() === fromId.toString());
     const toNode = this.stage.find(`.${targetType}`).find((n) => n.id() === toId.toString());
 
     if (!fromNode || !toNode) return;
 
-    // 2. Helper to get the center of a node based on its type
-    const getCenter = (node: Konva.Node, type: string) => {
-      if (type === 'queue') {
-        // Queues are 70x50 Rects, so add half width/height to top-left (x,y)
-        return { x: node.x() + 35, y: node.y() + 25 };
-      }
-      // Machines are Circles centered at their own (x,y)
-      return { x: node.x(), y: node.y() };
-    };
-
     const updatePoints = () => {
-      const start = getCenter(fromNode, sourceType);
-      const end = getCenter(toNode, targetType);
+      // 1. Get centers
+      const c1 = this.getCenter(fromNode, sourceType);
+      const c2 = this.getCenter(toNode, targetType);
 
-      // Points order: [startX, startY, endX, endY]
-      // The arrow head automatically renders at (endX, endY)
+      // 2. Calculate edge points
+      const start = this.getEdgePoint(c1, c2, sourceType);
+      const end = this.getEdgePoint(c2, c1, targetType);
+
       arrow.points([start.x, start.y, end.x, end.y]);
       this.layer.batchDraw();
     };
 
-    const startPos = getCenter(fromNode, sourceType);
-    const endPos = getCenter(toNode, targetType);
+    // Initial calculation
+    const c1 = this.getCenter(fromNode, sourceType);
+    const c2 = this.getCenter(toNode, targetType);
+    const start = this.getEdgePoint(c1, c2, sourceType);
+    const end = this.getEdgePoint(c2, c1, targetType);
 
     const arrow = new Konva.Arrow({
-      points: [startPos.x, startPos.y, endPos.x, endPos.y],
+      points: [start.x, start.y, end.x, end.y],
       pointerLength: 10,
       pointerWidth: 10,
       fill: '#475569',
@@ -170,9 +164,52 @@ export class KonvaService {
     toNode.on('dragmove', updatePoints);
 
     this.layer.add(arrow);
-    arrow.moveToBottom();
     this.layer.draw();
   }
+
+  clear() {
+    this.layer.destroyChildren();
+    this.layer.draw();
+  }
+
+  /// Helpers
+
+  private getCenter(node: Konva.Node, type: string) {
+    return type === 'queue' ? { x: node.x() + 35, y: node.y() + 25 } : { x: node.x(), y: node.y() };
+  }
+
+  private getEdgePoint(from: { x: number; y: number }, to: { x: number; y: number }, type: string) {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const angle = Math.atan2(dy, dx);
+
+    if (type === 'machine') {
+      const radius = 37;
+      return {
+        x: from.x + radius * Math.cos(angle),
+        y: from.y + radius * Math.sin(angle),
+      };
+    } else {
+      const w = 70 / 2 + 2;
+      const h = 50 / 2 + 2;
+
+      const absCos = Math.abs(Math.cos(angle));
+      const absSin = Math.abs(Math.sin(angle));
+
+      let distance;
+      if (w * absSin <= h * absCos) {
+        distance = w / absCos;
+      } else {
+        distance = h / absSin;
+      }
+
+      return {
+        x: from.x + distance * Math.cos(angle),
+        y: from.y + distance * Math.sin(angle),
+      };
+    }
+  }
+
   private addClickEvents(group: Konva.Group, id: number, type: 'machine' | 'queue' | 'connection') {
     group.on('click', () => {
       const currentMode = this._editMode();
@@ -180,10 +217,5 @@ export class KonvaService {
       const layout = this.injector.get(LayoutService);
       layout.handleInteraction(id, currentMode, type);
     });
-  }
-
-  clear() {
-    this.layer.destroyChildren();
-    this.layer.draw();
   }
 }
