@@ -47,15 +47,6 @@ public class SimulationService implements SimulationEventListener {
     }
 
 
-    // called by the controller when stopping the simulation
-    public void stop() {
-        this.running = false;
-        machineThreads.forEach(Thread::interrupt);
-        machineThreads.clear();
-        layoutService.setLocked(false);
-        producer.interrupt();
-    }
-
     // when the user reset the canvas to start a new simulation
     public void resetSimulation(){
         layoutService.setLocked(false);
@@ -110,6 +101,14 @@ public class SimulationService implements SimulationEventListener {
 
         producer = new Thread(this::generateProducts);
         producer.start();
+    }
+
+    private void stop() {
+        this.running = false;
+        machineThreads.forEach(Thread::interrupt);
+        machineThreads.clear();
+        layoutService.setLocked(false);
+        producer.interrupt();
     }
 
     private void generateProducts() {
