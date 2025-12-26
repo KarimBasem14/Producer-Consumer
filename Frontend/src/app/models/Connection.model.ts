@@ -1,6 +1,6 @@
 export interface Connection {
-  id: Number;
-  fromId: Number;
-  toId: Number;
-  direction: Number;
+  id: number;
+  fromId: number;
+  toId: number;
+  direction: number;
 }

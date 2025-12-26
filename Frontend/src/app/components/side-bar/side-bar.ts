@@ -9,6 +9,7 @@ import {
   Plus,
   LucideAngularModule,
 } from 'lucide-angular';
+import { LayoutService } from '../../services/layout-service/layout-service';
 
 @Component({
   selector: 'app-side-bar',
@@ -19,6 +20,7 @@ import {
 export class SideBar {
   // Injecting the service using the newest inject() function
   private simService: SimulationService = inject(SimulationService);
+  private layoutService: LayoutService = inject(LayoutService);
 
   // Exposing the service signals to the template
   public editMode = this.simService.editMode;
@@ -36,13 +38,11 @@ export class SideBar {
   readonly Plus = Plus;
 
   onAddMachine() {
-    // TODO: Implement machine addition logic
-    // This would update the state through updateState()
+    this.layoutService.addMachine();
   }
 
   onAddQueue() {
-    // TODO: Implement queue addition logic
-    // This would update the state through updateState()
+    this.layoutService.addQueue();
   }
 
   onSetMode(mode: 'select' | 'connect' | 'delete') {
