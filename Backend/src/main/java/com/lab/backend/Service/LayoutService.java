@@ -33,7 +33,6 @@ public class LayoutService {
         QueueDTO queue = new QueueDTO();
         queue.x = q.x;
         queue.y = q.y;
-        queue.color = "white";
         queue.id = ((long)getQueues().size()+1);
         queues.put(q.getId(), queue);
         return queue;

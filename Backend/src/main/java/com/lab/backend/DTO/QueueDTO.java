@@ -12,7 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 public class QueueDTO {
     public Long id;
-    public String color;
     public int x;
     public int y;
     public String text;
