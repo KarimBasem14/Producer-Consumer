@@ -27,13 +27,13 @@ export class KonvaService {
   }
 
   // Draw a machine (circle)
-  drawMachine() {
+  drawMachine(id: string, x: number, y: number, color: string) {
     const circle = new Konva.Circle({
-
-      x: 100,
-      y: 100,
+      id,
+      x,
+      y,
       radius: 30,
-      fill: "white",
+      fill: color,
       stroke: 'black',
       strokeWidth: 2,
       draggable: true
@@ -41,7 +41,6 @@ export class KonvaService {
     this.layer.add(circle);
     this.layer.draw();
 
-    // Should call backend
   }
 
   // Draw a queue (rectangle)
