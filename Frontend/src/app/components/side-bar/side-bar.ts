@@ -1,5 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { SimulationService } from '../../services/simulation-service/simulation-service';
+import { KonvaService } from '../../services/konva-service/konva-service';
+import { LayoutService } from '../../services/layout-service/layout-service';
 import {
   Circle,
   Square,
@@ -9,7 +11,6 @@ import {
   Plus,
   LucideAngularModule,
 } from 'lucide-angular';
-import { LayoutService } from '../../services/layout-service/layout-service';
 
 @Component({
   selector: 'app-side-bar',
