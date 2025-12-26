@@ -9,7 +9,6 @@ import {
   Plus,
   LucideAngularModule,
 } from 'lucide-angular';
-import { KonvaService } from '../../services/konva-service/konva-service';
 
 @Component({
   selector: 'app-side-bar',
@@ -20,7 +19,6 @@ import { KonvaService } from '../../services/konva-service/konva-service';
 export class SideBar {
   // Injecting the service using the newest inject() function
   private simService: SimulationService = inject(SimulationService);
-  private konvaService: KonvaService = inject(KonvaService);
 
   // Exposing the service signals to the template
   public editMode = this.simService.editMode;
@@ -40,7 +38,6 @@ export class SideBar {
   onAddMachine() {
     // TODO: Implement machine addition logic
     // This would update the state through updateState()
-    this.konvaService.drawMachine();
   }
 
   onAddQueue() {
