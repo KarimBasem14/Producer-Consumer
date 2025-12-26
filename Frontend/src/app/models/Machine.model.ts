@@ -1,5 +1,5 @@
 export interface Machine {
-  id: Number;
+  id: number;
   color: string;
   x: number;
   y: number;

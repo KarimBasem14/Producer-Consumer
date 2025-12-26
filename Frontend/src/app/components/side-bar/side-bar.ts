@@ -1,5 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { SimulationService } from '../../services/simulation-service/simulation-service';
+import { KonvaService } from '../../services/konva-service/konva-service';
+import { LayoutService } from '../../services/layout-service/layout-service';
 import {
   Circle,
   Square,
@@ -10,6 +12,7 @@ import {
   LucideAngularModule,
 } from 'lucide-angular';
 
+
 @Component({
   selector: 'app-side-bar',
   imports: [LucideAngularModule],
@@ -19,6 +22,10 @@ import {
 export class SideBar {
   // Injecting the service using the newest inject() function
   private simService: SimulationService = inject(SimulationService);
+  private konvaService: KonvaService = inject(KonvaService);
+  private layoutService: LayoutService = inject(LayoutService);
+
+  private machineCount = 0;
 
   // Exposing the service signals to the template
   public editMode = this.simService.editMode;
@@ -36,8 +43,16 @@ export class SideBar {
   readonly Plus = Plus;
 
   onAddMachine() {
-    // TODO: Implement machine addition logic
-    // This would update the state through updateState()
+    const { x, y } = this.getNextMachinePosition();
+    this.layoutService.addMachine(x, y).subscribe(machine => {
+      this.konvaService.drawMachine(
+      `machine-${machine.id}`,
+      machine.x,
+      machine.y,
+      machine.color
+    );
+    })
+    
   }
 
   onAddQueue() {
@@ -47,5 +62,22 @@ export class SideBar {
 
   onSetMode(mode: 'select' | 'connect' | 'delete') {
     this.simService.setEditMode(mode);
+  }
+
+  private getNextMachinePosition() {
+    const COLS = 5;
+    const SPACING = 120;
+    const START_X = 100;
+    const START_Y = 100;
+
+    const col = this.machineCount % COLS;
+    const row = Math.floor(this.machineCount / COLS);
+
+    this.machineCount++;
+
+    return {
+      x: START_X + col * SPACING,
+      y: START_Y + row * SPACING,
+    };
   }
 }
