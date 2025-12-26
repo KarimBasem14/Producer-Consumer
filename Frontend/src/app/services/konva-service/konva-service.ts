@@ -27,13 +27,13 @@ export class KonvaService {
   }
 
   // Draw a machine (circle)
-  drawMachine(id: string, x: number, y: number, color: string = '#4A90E2') {
+  drawMachine() {
     const circle = new Konva.Circle({
-      id,
-      x,
-      y,
+
+      x: 100,
+      y: 100,
       radius: 30,
-      fill: color,
+      fill: "white",
       stroke: 'black',
       strokeWidth: 2,
       draggable: true

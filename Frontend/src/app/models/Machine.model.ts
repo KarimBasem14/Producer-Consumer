@@ -1,7 +1,7 @@
 export interface Machine {
-  id: string;
+  id: Number;
+  color: string;
   x: number;
   y: number;
-  processing?: boolean;
-  currentColor?: string;
+  text: string;
 }

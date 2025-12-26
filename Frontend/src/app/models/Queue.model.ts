@@ -1,8 +1,6 @@
-import {Product} from './Product.model';
-
 export interface Queue {
-  id: string;
+  id: Number;
   x: number;
   y: number;
-  products: Product[];
+  size: number;
 }
