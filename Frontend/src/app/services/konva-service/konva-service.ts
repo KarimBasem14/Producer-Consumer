@@ -26,7 +26,7 @@ export class KonvaService {
   }
 
   // Draw a machine (circle)
-  drawMachine(id: string, x: number, y: number, color: string = '#4A90E2') {
+  drawMachine(id: string, x: number, y: number, color: string = '#fff') {
     const circle = new Konva.Circle({
       id,
       x,
@@ -44,7 +44,7 @@ export class KonvaService {
   }
 
   // Draw a queue (rectangle)
-  drawQueue(id: string, x: number, y: number, color: string = '#E8B84A') {
+  drawQueue(id: string, x: number, y: number, color: string = '#fff') {
     const rect = new Konva.Rect({
       id,
       x,
