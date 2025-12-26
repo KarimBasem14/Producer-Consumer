@@ -8,7 +8,9 @@ import {
   MousePointer,
   Link,
   Trash2,
+  HandGrab,
   Plus,
+  MoveRight,
   LucideAngularModule,
 } from 'lucide-angular';
 
@@ -22,6 +24,7 @@ export class SideBar {
   // Injecting the service using the newest inject() function
   private simService: SimulationService = inject(SimulationService);
   private layoutService: LayoutService = inject(LayoutService);
+  konvaService: KonvaService = inject(KonvaService);
 
   // Exposing the service signals to the template
   public editMode = this.simService.editMode;
@@ -37,6 +40,8 @@ export class SideBar {
   readonly Link = Link;
   readonly Trash2 = Trash2;
   readonly Plus = Plus;
+  readonly HandGrab = HandGrab;
+  readonly MoveRight = MoveRight;
 
   onAddMachine() {
     this.layoutService.addMachine();
@@ -47,6 +52,6 @@ export class SideBar {
   }
 
   onSetMode(mode: 'select' | 'connect' | 'delete') {
-    this.simService.setEditMode(mode);
+    this.konvaService.setEditMode(mode);
   }
 }

@@ -1,4 +1,4 @@
-import { inject, Injectable, Injector } from '@angular/core';
+import { inject, Injectable, Injector, signal } from '@angular/core';
 import Konva from 'konva';
 import { LayoutService } from '../layout-service/layout-service';
 import { Machine } from '../../models/Machine.model';
@@ -6,7 +6,8 @@ import { Machine } from '../../models/Machine.model';
 @Injectable({ providedIn: 'root' })
 export class KonvaService {
   private injector = inject(Injector);
-
+  private _editMode = signal<'select' | 'connect' | 'delete'>('select');
+  public editMode = this._editMode.asReadonly();
   private stage!: Konva.Stage;
   private layer!: Konva.Layer;
 
@@ -20,12 +21,17 @@ export class KonvaService {
     this.stage.add(this.layer);
   }
 
+  setEditMode(mode: 'select' | 'connect' | 'delete') {
+    this._editMode.set(mode);
+  }
+
   drawMachine(dto: Machine, counter: number) {
     const group = new Konva.Group({
       id: dto.id.toString(),
       x: dto.x,
       y: dto.y,
       draggable: true,
+      name: 'machine',
     });
 
     const circle = new Konva.Circle({
@@ -55,6 +61,7 @@ export class KonvaService {
 
     label.offsetX(label.width() / 2);
     label.offsetY(label.height() / 2);
+    this.addClickEvents(group, dto.id, 'machine');
 
     group.on('dragend', () => {
       const layoutService = this.injector.get(LayoutService);
@@ -72,6 +79,7 @@ export class KonvaService {
       x: dto.x,
       y: dto.y,
       draggable: true,
+      name: 'queue',
     });
 
     const rect = new Konva.Rect({
@@ -103,7 +111,7 @@ export class KonvaService {
 
     group.add(rect);
     group.add(text);
-
+    this.addClickEvents(group, dto.id, 'queue');
     group.on('dragend', () => {
       const layoutService = this.injector.get(LayoutService);
       layoutService.updateQueuePosition(group.id(), group.x(), group.y());
@@ -111,6 +119,55 @@ export class KonvaService {
 
     this.layer.add(group);
     this.layer.draw();
+  }
+
+  drawConnection(
+    fromId: number,
+    sourceType: 'machine' | 'queue' | 'connection',
+    toId: number,
+    targetType: 'machine' | 'queue' | 'connection'
+  ) {
+    console.log('drawing connection');
+
+    const fromNode = this.stage.findOne(`.${sourceType}#${fromId.toString()}`);
+    const toNode = this.stage.findOne(`.${targetType}#${toId.toString()}`);
+
+    if (!fromNode || !toNode) {
+      console.error(`Could not find ${sourceType}#${fromId} or ${targetType}#${toId}`);
+      return;
+    }
+
+    const arrow = new Konva.Arrow({
+      // We use fromNode directly because it is the Group
+      points: [fromNode.x(), fromNode.y(), toNode.x(), toNode.y()],
+      pointerLength: 8,
+      pointerWidth: 8,
+      fill: '#475569',
+      stroke: '#475569',
+      strokeWidth: 2,
+      id: `link-${sourceType}-${fromId}-${targetType}-${toId}`,
+    });
+
+    const updatePoints = () => {
+      arrow.points([fromNode.x(), fromNode.y(), toNode.x(), toNode.y()]);
+      this.layer.batchDraw();
+    };
+
+    fromNode.on('dragmove', updatePoints);
+    toNode.on('dragmove', updatePoints);
+
+    this.layer.add(arrow);
+    arrow.moveToBottom();
+    this.layer.draw();
+  }
+
+  private addClickEvents(group: Konva.Group, id: number, type: 'machine' | 'queue' | 'connection') {
+    group.on('click', () => {
+      const currentMode = this._editMode();
+
+      const layout = this.injector.get(LayoutService);
+      layout.handleInteraction(id, currentMode, type);
+    });
   }
 
   clear() {
