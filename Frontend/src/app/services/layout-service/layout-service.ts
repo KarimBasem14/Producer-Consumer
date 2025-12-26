@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { KonvaService } from '../konva-service/konva-service';
 import { SignalZero } from 'lucide-angular';
+import { first } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,8 @@ import { SignalZero } from 'lucide-angular';
 export class LayoutService {
   private http = inject(HttpClient);
   private konva = inject(KonvaService);
+  private firstSelectedId: number | null = null;
+  private firstSelectedType: 'machine' | 'queue' | 'connection' | null = null;
 
   private readonly API_BASE = 'http://localhost:8080/layout';
   private machineOffset = 0;
@@ -88,6 +91,61 @@ export class LayoutService {
           console.error('Update failed:', err);
         },
       });
+  }
+
+  handleInteraction(id: number, currentMode: string, type: 'machine' | 'queue' | 'connection') {
+    if (currentMode === 'delete') {
+      this.deleteComponent(id);
+    } else if (currentMode === 'connect') {
+      this.handleConnectFlow(id, type);
+    }
+  }
+
+  private handleConnectFlow(id: number, type: 'machine' | 'queue' | 'connection') {
+    if (this.firstSelectedId === null) {
+      this.firstSelectedId = id;
+      this.firstSelectedType = type;
+      console.log(`Source ${id} selected. Click target.`);
+      // You could call a konva method here to make the shape "glow"
+    } else {
+      const sourceId = this.firstSelectedId;
+      const targetId = id;
+      const sourceType = this.firstSelectedType;
+      const targetType = type;
+      console.log(`Source ${sourceId} selected. target ${targetId} Selected.`);
+      this.firstSelectedId = null;
+      this.firstSelectedType = null;
+
+      if (sourceType === targetType) {
+        console.log('Cannot connect two components of the same type.');
+        return;
+      }
+
+      if (sourceType === 'connection' || targetType === 'connection') {
+        console.log('Connecting from/to connections is not allowed.');
+        return;
+      }
+
+      if (!sourceType || !targetType) {
+        console.log('Invalid source or target type.');
+        return;
+      }
+
+      const dto = {
+        fromId: sourceId,
+        toId: targetId,
+        direction: sourceType === 'machine' ? 0 : 1,
+      };
+
+      this.http.post(`${this.API_BASE}/connections/add`, dto, { responseType: 'text' }).subscribe({
+        next: () => this.konva.drawConnection(sourceId, sourceType, targetId, targetType),
+        error: (err) => console.error('Connection rejected by backend', err),
+      });
+    }
+  }
+
+  deleteComponent(id: number) {
+    // Nour :) Smile
   }
 
   clearAll() {

@@ -4,9 +4,7 @@
       <div class="status-dot animate-pulse-glow"></div>
       Assembly Line
     </h1>
-    <p class="sidebar-subtitle font-mono">
-      Producer/Consumer Simulation
-    </p>
+    <p class="sidebar-subtitle font-mono">Producer/Consumer Simulation</p>
   </div>
 
   <div class="sidebar-section">
@@ -41,20 +39,25 @@
     <div class="button-list">
       @let mode = editMode();
 
-      <button (click)="onSetMode('select')"
-              [class.active]="mode === 'select'" class="sidebar-item">
-        <lucide-icon [name]="MousePointer" size="16"></lucide-icon>
+      <button (click)="onSetMode('select')" [class.active]="mode === 'select'" class="sidebar-item">
+        <lucide-icon [name]="HandGrab" size="16"></lucide-icon>
         <span>Select & Move</span>
       </button>
 
-      <button (click)="onSetMode('connect')"
-              [class.active]="mode === 'connect'" class="sidebar-item">
-        <lucide-icon [name]="Link" size="16"></lucide-icon>
+      <button
+        (click)="onSetMode('connect')"
+        [class.active]="mode === 'connect'"
+        class="sidebar-item"
+      >
+        <lucide-icon [name]="MoveRight" size="16"></lucide-icon>
         <span>Connect</span>
       </button>
 
-      <button (click)="onSetMode('delete')"
-              [class.active]="mode === 'delete'" class="sidebar-item delete-mode">
+      <button
+        (click)="onSetMode('delete')"
+        [class.active]="mode === 'delete'"
+        class="sidebar-item delete-mode"
+      >
         <lucide-icon [name]="Trash2" size="16"></lucide-icon>
         <span>Delete</span>
       </button>
