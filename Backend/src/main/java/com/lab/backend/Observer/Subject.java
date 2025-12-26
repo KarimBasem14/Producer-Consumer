@@ -1,6 +1,6 @@
-package Observer;
+package com.lab.backend.Observer;
 
-import Model.Machine;
+import com.lab.backend.Model.Machine;
 
 public interface Subject {
     void registerObserver(Machine machine);

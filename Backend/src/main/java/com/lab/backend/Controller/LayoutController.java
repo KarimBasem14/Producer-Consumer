@@ -1,9 +1,9 @@
-package Controller;
+package com.lab.backend.Controller;
 
-import DTO.ConnectionDTO;
-import DTO.MachineDTO;
-import DTO.QueueDTO;
-import Service.LayoutService;
+import com.lab.backend.DTO.ConnectionDTO;
+import com.lab.backend.DTO.MachineDTO;
+import com.lab.backend.DTO.QueueDTO;
+import com.lab.backend.Service.LayoutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

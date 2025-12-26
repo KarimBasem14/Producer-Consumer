@@ -1,14 +1,12 @@
-package Service;
-import DTO.UIStateDTO;
-import Model.Machine;
-import Model.Product;
-import Model.Queue;
+package com.lab.backend.Service;
+import com.lab.backend.DTO.UIStateDTO;
+import com.lab.backend.Model.Machine;
+import com.lab.backend.Model.Product;
+import com.lab.backend.Model.Queue;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.tomcat.autoconfigure.TomcatServerProperties;
 import org.springframework.stereotype.Service;
-import DTO.ConnectionDTO;
-import snapshot.SimulationState;
-import snapshot.SnapshotManager;
+import com.lab.backend.snapshot.SimulationState;
+import com.lab.backend.snapshot.SnapshotManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;

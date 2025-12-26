@@ -1,4 +1,4 @@
-package DTO;
+package com.lab.backend.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

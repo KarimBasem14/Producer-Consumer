@@ -1,4 +1,4 @@
-package DTO;
+package com.lab.backend.DTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,10 +10,11 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MachineDTO {
+public class QueueDTO {
     public Long id;
     public String color;
     public int x;
     public int y;
     public String text;
+    int size;
 }

@@ -1,11 +1,11 @@
-package Service;
-import Model.Machine;
-import Model.Queue;
+package com.lab.backend.Service;
+import com.lab.backend.Model.Machine;
+import com.lab.backend.Model.Queue;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
-import DTO.ConnectionDTO;
-import DTO.MachineDTO;
-import DTO.QueueDTO;
+import com.lab.backend.DTO.ConnectionDTO;
+import com.lab.backend.DTO.MachineDTO;
+import com.lab.backend.DTO.QueueDTO;
 
 import java.util.HashMap;
 import java.util.Map;

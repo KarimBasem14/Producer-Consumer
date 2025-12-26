@@ -1,6 +1,6 @@
-package Model;
-import Observer.Observer;
-import Service.SimulationEventListener;
+package com.lab.backend.Model;
+import com.lab.backend.Observer.Observer;
+import com.lab.backend.Service.SimulationEventListener;
 import lombok.Getter;
 import lombok.Setter;
 

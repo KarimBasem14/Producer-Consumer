@@ -1,4 +1,4 @@
-package Model;
+package com.lab.backend.Model;
 
 import lombok.Getter;
 

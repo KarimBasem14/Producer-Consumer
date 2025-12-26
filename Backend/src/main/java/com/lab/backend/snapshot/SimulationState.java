@@ -1,7 +1,7 @@
-package snapshot;
+package com.lab.backend.snapshot;
 
 
-import Model.Product;
+import com.lab.backend.Model.Product;
 import lombok.Getter;
 
 import java.util.List;

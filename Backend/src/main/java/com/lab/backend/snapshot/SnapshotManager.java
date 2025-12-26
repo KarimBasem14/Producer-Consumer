@@ -1,4 +1,4 @@
-package snapshot;
+package com.lab.backend.snapshot;
 
 import java.util.ArrayList;
 import java.util.List;
