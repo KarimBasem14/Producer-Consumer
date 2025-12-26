@@ -123,35 +123,48 @@ export class KonvaService {
 
   drawConnection(
     fromId: number,
-    sourceType: 'machine' | 'queue' | 'connection',
+    sourceType: 'machine' | 'queue',
     toId: number,
-    targetType: 'machine' | 'queue' | 'connection'
+    targetType: 'machine' | 'queue'
   ) {
-    console.log('drawing connection');
+    // 1. Find the nodes using the safer find() method to handle ID collisions
+    const fromNode = this.stage.find(`.${sourceType}`).find((n) => n.id() === fromId.toString());
+    const toNode = this.stage.find(`.${targetType}`).find((n) => n.id() === toId.toString());
 
-    const fromNode = this.stage.findOne(`.${sourceType}#${fromId.toString()}`);
-    const toNode = this.stage.findOne(`.${targetType}#${toId.toString()}`);
+    if (!fromNode || !toNode) return;
 
-    if (!fromNode || !toNode) {
-      console.error(`Could not find ${sourceType}#${fromId} or ${targetType}#${toId}`);
-      return;
-    }
-
-    const arrow = new Konva.Arrow({
-      // We use fromNode directly because it is the Group
-      points: [fromNode.x(), fromNode.y(), toNode.x(), toNode.y()],
-      pointerLength: 8,
-      pointerWidth: 8,
-      fill: '#475569',
-      stroke: '#475569',
-      strokeWidth: 2,
-      id: `link-${sourceType}-${fromId}-${targetType}-${toId}`,
-    });
+    // 2. Helper to get the center of a node based on its type
+    const getCenter = (node: Konva.Node, type: string) => {
+      if (type === 'queue') {
+        // Queues are 70x50 Rects, so add half width/height to top-left (x,y)
+        return { x: node.x() + 35, y: node.y() + 25 };
+      }
+      // Machines are Circles centered at their own (x,y)
+      return { x: node.x(), y: node.y() };
+    };
 
     const updatePoints = () => {
-      arrow.points([fromNode.x(), fromNode.y(), toNode.x(), toNode.y()]);
+      const start = getCenter(fromNode, sourceType);
+      const end = getCenter(toNode, targetType);
+
+      // Points order: [startX, startY, endX, endY]
+      // The arrow head automatically renders at (endX, endY)
+      arrow.points([start.x, start.y, end.x, end.y]);
       this.layer.batchDraw();
     };
+
+    const startPos = getCenter(fromNode, sourceType);
+    const endPos = getCenter(toNode, targetType);
+
+    const arrow = new Konva.Arrow({
+      points: [startPos.x, startPos.y, endPos.x, endPos.y],
+      pointerLength: 10,
+      pointerWidth: 10,
+      fill: '#475569',
+      stroke: '#475569',
+      strokeWidth: 3,
+      id: `link-${sourceType}-${fromId}-${targetType}-${toId}`,
+    });
 
     fromNode.on('dragmove', updatePoints);
     toNode.on('dragmove', updatePoints);
@@ -160,7 +173,6 @@ export class KonvaService {
     arrow.moveToBottom();
     this.layer.draw();
   }
-
   private addClickEvents(group: Konva.Group, id: number, type: 'machine' | 'queue' | 'connection') {
     group.on('click', () => {
       const currentMode = this._editMode();
