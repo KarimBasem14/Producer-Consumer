@@ -1,21 +1,16 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable, Injector } from '@angular/core';
 import Konva from 'konva';
+import { LayoutService } from '../layout-service/layout-service';
+import { Machine } from '../../models/Machine.model';
 
 @Injectable({ providedIn: 'root' })
 export class KonvaService {
-  /*
-   * This service is used to deal with drawing things on the canvas.
-   * This "drawing" involves actually drawing it using Konva, and sending a request to the backend
-   */
+  private injector = inject(Injector);
 
-  private stage!: Konva.Stage; // Our canvas
-  private layer!: Konva.Layer; // A stage/canvas needs a layer to do draw on
+  private stage!: Konva.Stage;
+  private layer!: Konva.Layer;
 
   initialize(container: string) {
-    /*
-     * Initializes the stage for konva.
-     *
-     */
     this.stage = new Konva.Stage({
       container,
       width: window.innerWidth - 260,
@@ -25,63 +20,101 @@ export class KonvaService {
     this.stage.add(this.layer);
   }
 
-  // Draw a machine (circle)
-  drawMachine(id: string, x: number, y: number, color: string) {
+  drawMachine(dto: Machine, counter: number) {
+    const group = new Konva.Group({
+      id: dto.id.toString(),
+      x: dto.x,
+      y: dto.y,
+      draggable: true,
+    });
+
     const circle = new Konva.Circle({
-      id,
-      x,
-      y,
-      radius: 30,
-      fill: color,
-      stroke: 'black',
+      radius: 35,
+      fillRadialGradientStartPoint: { x: -10, y: -10 },
+      fillRadialGradientStartRadius: 0,
+      fillRadialGradientEndPoint: { x: -10, y: -10 },
+      fillRadialGradientEndRadius: 60,
+      fillRadialGradientColorStops: [0, 'white', 1, dto.color || '#f0f0f0'],
+      stroke: '#444',
       strokeWidth: 2,
-      draggable: true,
+      shadowColor: 'black',
+      shadowBlur: 10,
+      shadowOffset: { x: 5, y: 5 },
+      shadowOpacity: 0.2,
     });
-    this.layer.add(circle);
-    this.layer.draw();
 
+    const label = new Konva.Text({
+      text: `M${counter}`,
+      fontSize: 16,
+      fontFamily: 'Inter, Arial',
+      fontStyle: 'bold',
+      fill: '#333',
+      align: 'center',
+      verticalAlign: 'middle',
+    });
+
+    label.offsetX(label.width() / 2);
+    label.offsetY(label.height() / 2);
+
+    group.on('dragend', () => {
+      const layoutService = this.injector.get(LayoutService);
+      layoutService.updateMachinePosition(group.id(), group.x(), group.y());
+    });
+
+    group.add(circle, label);
+    this.layer.add(group);
+    this.layer.draw();
   }
 
-  // Draw a queue (rectangle)
-  drawQueue(id: string, x: number, y: number, color: string = '#fff') {
+  drawQueue(dto: any, counter: number) {
+    const group = new Konva.Group({
+      id: dto.id.toString(),
+      x: dto.x,
+      y: dto.y,
+      draggable: true,
+    });
+
     const rect = new Konva.Rect({
-      id,
-      x,
-      y,
-      width: 60,
-      height: 60,
-      fill: color,
-      stroke: 'black',
+      width: 70,
+      height: 50,
+      cornerRadius: 8,
+      fillLinearGradientStartPoint: { x: 0, y: 0 },
+      fillLinearGradientEndPoint: { x: 0, y: 50 },
+      fillLinearGradientColorStops: [0, '#3b82f6', 1, '#1d4ed8'],
+      stroke: '#1e40af',
       strokeWidth: 2,
-      draggable: true,
+      shadowColor: 'black',
+      shadowBlur: 8,
+      shadowOffset: { x: 3, y: 3 },
+      shadowOpacity: 0.3,
     });
-    this.layer.add(rect);
-    this.layer.draw();
 
-    // Should call backend
+    const text = new Konva.Text({
+      text: `Q${counter}\n${dto.size} P`,
+      fontSize: 14,
+      fontFamily: 'Inter, Arial',
+      fill: 'white',
+      width: 70,
+      height: 50,
+      align: 'center',
+      verticalAlign: 'middle',
+      fontStyle: 'bold',
+    });
+
+    group.add(rect);
+    group.add(text);
+
+    group.on('dragend', () => {
+      const layoutService = this.injector.get(LayoutService);
+      layoutService.updateQueuePosition(group.id(), group.x(), group.y());
+    });
+
+    this.layer.add(group);
+    this.layer.draw();
   }
 
-  // Draw a connection line
-  drawConnection(id: string, fromX: number, fromY: number, toX: number, toY: number) {
-    const line = new Konva.Line({
-      id,
-      points: [fromX, fromY, toX, toY],
-      stroke: 'black',
-      strokeWidth: 2,
-      lineCap: 'round',
-      lineJoin: 'round',
-    });
-    this.layer.add(line);
-    this.layer.draw();
-
-    // Should call backend
-  }
-
-  // Clears the stage
   clear() {
     this.layer.destroyChildren();
     this.layer.draw();
-
-    // Should call backend
   }
 }

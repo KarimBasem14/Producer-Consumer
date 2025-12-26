@@ -1,5 +1,5 @@
 export interface Queue {
-  id: Number;
+  id: number;
   x: number;
   y: number;
   size: number;
