@@ -24,6 +24,8 @@ export class LayoutService {
   private queueCounter = 0;
   private connectionCounter = 0;
 
+  private connectionIdMap: Record<number, string> = {};
+
   addMachine() {
     const initialData = {
       x: 100 + this.machineOffset,
@@ -145,17 +147,24 @@ export class LayoutService {
         direction: sourceType === 'machine' ? 0 : 1,
       };
 
-      this.http
-        .post(`${this.API_BASE}/connections/add`, dto, { responseType: 'text' })
-        .subscribe({
-          next: () => {
-            const arrowId = `link-${this.connectionCounter}-${sourceType}-${sourceId}-${targetType}-${targetId}`;
-            this.connectionCounter++;
+      this.http.post<Connection>(`${this.API_BASE}/connections/add`, dto).subscribe({
+        next: (savedConnection) => {
+          const arrowId = `link-${savedConnection.id}-${sourceType}-${sourceId}-${targetType}-${targetId}`;
+          this.connectionCounter++;
+          this.connectionIdMap[savedConnection.id] = arrowId;
+          console.log(arrowId);
 
-            this.konva.drawConnection(arrowId, sourceId, sourceType, targetId, targetType);
-          },
-          error: (err) => console.error('Connection rejected by backend', err),
-        });
+          this.konva.drawConnection(
+            savedConnection.id,
+            arrowId,
+            sourceId,
+            sourceType,
+            targetId,
+            targetType
+          );
+        },
+        error: (err) => console.error('Connection rejected by backend', err),
+      });
     }
   }
 
@@ -174,6 +183,25 @@ export class LayoutService {
         next: () => this.konva.removeNode(`queue-${id}`),
         error: (err) => console.error('Failed to delete queue', err),
       });
+    }
+    if (type === 'connection') {
+      const arrowId = this.connectionIdMap[id];
+      this.http
+        .delete(`${this.API_BASE}/connections/delete/${id}`, { responseType: 'text' })
+        .subscribe({
+          next: () => {
+            if (arrowId) {
+              const arrow = this.konva.findShapeBySelector(`#${arrowId}`);
+              console.log('Arrow to delete:', arrow);
+
+              console.log(arrowId, this.connectionIdMap[id]);
+
+              this.konva.removeNode(arrowId);
+              delete this.connectionIdMap[id];
+            }
+          },
+          error: (err) => console.error('Failed to delete layout', err),
+        });
     }
   }
   private connectionExists(id1: number, type1: string, id2: number, type2: string): boolean {

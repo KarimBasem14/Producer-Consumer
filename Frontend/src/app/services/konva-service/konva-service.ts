@@ -36,7 +36,6 @@ export class KonvaService {
     });
 
     console.log(dto.id);
-    
 
     const circle = new Konva.Circle({
       radius: 35,
@@ -125,6 +124,7 @@ export class KonvaService {
     this.layer.draw();
   }
   drawConnection(
+    backendId: number,
     id: string,
     fromId: number,
     sourceType: 'machine' | 'queue',
@@ -133,9 +133,8 @@ export class KonvaService {
   ) {
     // const fromNode = this.stage.find(`.${sourceType}`).find((n) => n.id() === fromId.toString());
     // const toNode = this.stage.find(`.${targetType}`).find((n) => n.id() === toId.toString());
-const fromNode = this.stage.findOne(`#${sourceType}-${fromId}`);
-const toNode   = this.stage.findOne(`#${targetType}-${toId}`);
-
+    const fromNode = this.stage.findOne(`#${sourceType}-${fromId}`);
+    const toNode = this.stage.findOne(`#${targetType}-${toId}`);
 
     if (!fromNode || !toNode) return;
 
@@ -162,7 +161,15 @@ const toNode   = this.stage.findOne(`#${targetType}-${toId}`);
       fill: '#475569',
       stroke: '#475569',
       strokeWidth: 3,
-      id: `link-${id}-${sourceType}-${fromId}-${targetType}-${toId}`,
+      id: id,
+    });
+
+    arrow.on('click', () => {
+      const currentMode = this._editMode();
+      if (currentMode === 'delete') {
+        const layout = this.injector.get(LayoutService);
+        layout.handleInteraction(backendId, currentMode, 'connection');
+      }
     });
 
     fromNode.on('dragmove', updatePoints);
@@ -229,11 +236,10 @@ const toNode   = this.stage.findOne(`#${targetType}-${toId}`);
   }
 
   removeNode(id: string) {
-  const node = this.layer.findOne(`#${id}`);
-  if (!node) return;
+    const node = this.layer.findOne(`#${id}`);
+    if (!node) return;
 
-  node.destroy();
-  this.layer.draw();
-}
-
+    node.destroy();
+    this.layer.draw();
+  }
 }
