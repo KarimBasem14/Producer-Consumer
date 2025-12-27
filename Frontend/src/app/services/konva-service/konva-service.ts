@@ -35,7 +35,7 @@ export class KonvaService {
       name: 'machine',
     });
 
-    console.log(dto.id);
+    console.log(`Drawn machine with id: ${dto.id}`);
 
     const circle = new Konva.Circle({
       radius: 35,
@@ -86,7 +86,7 @@ export class KonvaService {
     });
 
     console.log(`q${dto.id}`);
-    
+
 
     const rect = new Konva.Rect({
       width: 70,
@@ -244,5 +244,26 @@ export class KonvaService {
 
     node.destroy();
     this.layer.draw();
+  }
+
+  updateMachineColor(machineId: number, newColor: string) {
+    // find group pattern, using the group ID format defined in drawMachine()
+    const group = this.stage.findOne(`#machine-${machineId}`) as Konva.Group;
+
+    if (group) {
+
+      // the group contains a circle (the machine) and a label in the circle
+      // we want to update the circle's color
+      const circle = group.findOne('Circle') as Konva.Circle;
+
+      if (circle) {
+        // update color
+        // keep 'white' at 0 and update the end color at 1
+        circle.fillRadialGradientColorStops([0, 'white', 1, newColor]);
+
+        // redraw
+        this.layer.batchDraw();
+      }
+    }
   }
 }

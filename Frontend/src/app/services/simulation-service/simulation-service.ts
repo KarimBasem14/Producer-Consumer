@@ -2,6 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { KonvaService } from '../konva-service/konva-service';
 import { SnapshotService } from '../snapshot-service/snapshot-service';
 import {HttpClient} from '@angular/common/http';
+import {UIStateDTO} from '../../models/UIState';
 
 @Injectable({ providedIn: 'root' })
 export class SimulationService {
@@ -29,6 +30,8 @@ export class SimulationService {
 
   private readonly API_BASE = 'http://localhost:8080/simulation';
 
+  private pollingInterval?: any;
+
   // Derived state for the Sidebar stats
   public totalProducts = computed(() =>
     this._queues().reduce((acc, q) => acc + (q.products?.length || 0), 0)
@@ -45,10 +48,50 @@ export class SimulationService {
     this._editMode.set(mode);
   }
 
+
+  // updates the ui every 200ms
+  private startPolling() {
+    this.pollingInterval = setInterval(() => {
+      this.http.get<any>(`${this.API_BASE}/state`).subscribe({
+        next: (state) => {
+
+          // update queue sizes
+          this._queues.update(queues => {
+            return queues.map(q => {
+              const backendQueue = state.queues.find((bq: any) => bq.id === q.id); // we should probably change that as that's very slow!
+              if (backendQueue) {
+                return { ...q, size: backendQueue.size };
+              }
+              return q;
+            });
+          });
+
+          // update machine colors through konva service
+          state.machineColors.forEach((colorData: any) => {
+            this.konvaService.updateMachineColor(colorData.machineId, colorData.color);
+          });
+        },
+        error: (err) => console.error('Polling error:', err)
+      });
+    }, 200);
+  }
+
   // Coordination logic
   start() {
     this._status.set('running');
+    this.http.post(`${this.API_BASE}/start`, {}, { responseType: 'text' })
+      .subscribe({
+        next: (response) => {
+          console.log('Simulation started:', response);
 
+
+          this.startPolling(); // asks the backend for the ui update every 200 ms
+        },
+        error: (err) => {
+          console.error('Failed to start simulation:', err);
+          this._status.set('stopped');
+        }
+      });
   }
 
   pause() {
@@ -57,6 +100,9 @@ export class SimulationService {
 
   stop() {
     this._status.set('stopped');
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
   }
 
   reset() {
