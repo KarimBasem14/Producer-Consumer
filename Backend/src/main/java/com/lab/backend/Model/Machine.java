@@ -42,6 +42,7 @@ public class Machine implements Runnable, Observer {
         while (running) {
             Product product = fetchNextProduct();
             if (product != null) {
+                setCurrentProduct(product);
                 stateChanged();
                 unregisterFromAllInQueues();
                 process(product);
@@ -81,7 +82,7 @@ public class Machine implements Runnable, Observer {
 
     private void process(Product product) {
         try {
-            Thread.sleep(this.processingTime);
+            Thread.sleep(this.processingTime*1000L);
         }catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
