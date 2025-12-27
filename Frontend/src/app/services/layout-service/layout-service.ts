@@ -168,7 +168,39 @@ export class LayoutService {
     }
   }
 
+  private deleteConnectionsOfNode(nodeId: number, nodeType: 'machine' | 'queue') {
+  // Find all connection IDs related to this node
+  const relatedConnectionIds = Object.entries(this.connectionIdMap)
+    .filter(([connId, arrowId]) => arrowId.includes(`${nodeType}-${nodeId}`))
+    .map(([connId]) => Number(connId));
+
+  // Delete each connection from backend and remove from Konva
+  relatedConnectionIds.forEach((connId) => {
+    const arrowId = this.connectionIdMap[connId];
+    if (!arrowId) return; 
+    this.http.delete(`${this.API_BASE}/connections/delete/${connId}`, { responseType: 'text' })
+      .subscribe({
+        next: () => {
+          if (arrowId) {
+              const arrow = this.konva.findShapeBySelector(`#${arrowId}`);
+              console.log('Arrow to delete:', arrow);
+
+              console.log(arrowId, this.connectionIdMap[connId]);
+
+              this.konva.removeNode(arrowId);
+              delete this.connectionIdMap[connId];
+            }
+        },
+        error: (err) => console.error('Failed to delete connection', err)
+      });
+  });
+}
+
   deleteComponent(id: number, type: 'machine' | 'queue' | 'connection') {
+    if (type === 'machine' || type === 'queue') {
+    this.deleteConnectionsOfNode(id, type);
+  }
+
     if (type === 'machine') {
       this.http
         .delete(`${this.API_BASE}/machines/delete/${id}`, { responseType: 'text' })

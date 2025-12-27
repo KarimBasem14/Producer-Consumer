@@ -85,6 +85,9 @@ export class KonvaService {
       name: 'queue',
     });
 
+    console.log(`q${dto.id}`);
+    
+
     const rect = new Konva.Rect({
       width: 70,
       height: 50,
