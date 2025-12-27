@@ -56,10 +56,10 @@ public class LayoutController {
 
     // connections
     @PostMapping("/connections/add")
-    public ResponseEntity<String> connect(@RequestBody ConnectionDTO connection) {
+    public ResponseEntity<ConnectionDTO> connect(@RequestBody ConnectionDTO connection) {
         // Validates that Ms and Qs are connected appropriately
-        layoutService.createConnection(connection);
-        return ResponseEntity.ok("Connection established");
+        ConnectionDTO createdConnection = layoutService.createConnection(connection);
+        return ResponseEntity.ok(createdConnection);
     }
 
     @DeleteMapping("/connections/delete/{id}")

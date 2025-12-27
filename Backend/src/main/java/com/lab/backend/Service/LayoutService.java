@@ -91,7 +91,7 @@ public class LayoutService {
     }
 
 
-    public void createConnection(ConnectionDTO conn) {
+    public ConnectionDTO createConnection(ConnectionDTO conn) {
         if (isLocked) throw new IllegalStateException("Cannot modify layout during simulation");
 
         if (isValidConnection(conn)) {
@@ -102,6 +102,7 @@ public class LayoutService {
 
             connection.id = ((long)getConnections().size()+1);
             connections.put(connection.getId(), connection);
+            return  connection;
         } else {
             throw new IllegalArgumentException("Invalid Connection");
         }
