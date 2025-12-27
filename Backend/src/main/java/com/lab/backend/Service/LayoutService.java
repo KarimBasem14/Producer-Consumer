@@ -19,6 +19,10 @@ public class LayoutService {
     private final Map<Long, QueueDTO> queues = new HashMap<>();
     private final Map<Long, MachineDTO> machines = new HashMap<>();
     private final Map<Long, ConnectionDTO> connections = new HashMap<>();
+    private long nextConnectionId = 1;
+    private long nextQueueId = 1;
+    private long nextMachineId = 1;
+
 
     private final SimulationEventListener listener;
 
@@ -31,12 +35,22 @@ public class LayoutService {
     // Flag to prevent modifications once the simulation is started
     private boolean isLocked = false;
 
+    public synchronized long generateConnectionId() {
+        return nextConnectionId++;
+    }
+    public synchronized long generateMachineId() {
+        return nextMachineId++;
+    }
+    public synchronized long generateQueueId() {
+        return nextQueueId++;
+    }
+
     public QueueDTO addQueue(QueueDTO q) {
         if (isLocked) throw new IllegalStateException("Cannot modify layout during simulation");
         QueueDTO queue = new QueueDTO();
         queue.x = q.x;
         queue.y = q.y;
-        queue.id = ((long)getQueues().size()+1);
+        queue.id = generateQueueId();
         queues.put(queue.getId(), queue);
         return queue;
     }
@@ -66,7 +80,7 @@ public class LayoutService {
         machine.x = m.x;
         machine.y = m.y;
         machine.color = "white";
-        machine.id = ((long)getMachines().size()+1);
+        machine.id = generateMachineId();
         machines.put(machine.getId(), machine);
         return machine;
     }
@@ -100,18 +114,28 @@ public class LayoutService {
             connection.toId = conn.toId;
             connection.direction = conn.direction;
 
-            connection.id = ((long)getConnections().size()+1);
+            connection.id = generateConnectionId();
             connections.put(connection.getId(), connection);
+            for (ConnectionDTO c : connections.values()) {
+                System.out.println(c.id);
+            }
             return  connection;
         } else {
             throw new IllegalArgumentException("Invalid Connection");
         }
     }
 
-    public void removeConnection(Long id){
+    public synchronized void removeConnection(Long id){
         if (isLocked) throw new IllegalStateException("Cannot modify layout during simulation");
-        if(!connections.containsKey(id)) {throw new IllegalStateException("Connection does not exist");}
-        connections.remove(id);
+        ConnectionDTO removed = connections.remove(id);
+
+        if (removed == null) {
+            // already deleted → ignore
+            return;
+        }
+        for (ConnectionDTO c : connections.values()) {
+            System.out.println(c.id);
+        }
     }
 
     private boolean isValidConnection(ConnectionDTO conn) {
@@ -134,6 +158,9 @@ public class LayoutService {
         queues.clear();
         machines.clear();
         connections.clear();
+        nextConnectionId = 1;
+        nextQueueId = 1;
+        nextMachineId = 1;
     }
 
     public void setUpSimulation(Map<Long, Machine> machinesModels, Map<Long, Queue> queuesModels){

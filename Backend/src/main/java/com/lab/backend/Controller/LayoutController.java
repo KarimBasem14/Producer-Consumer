@@ -63,9 +63,9 @@ public class LayoutController {
     }
 
     @DeleteMapping("/connections/delete/{id}")
-    public ResponseEntity<String> disconnect(@PathVariable Long id) {
+    public ResponseEntity<Void> disconnect(@PathVariable Long id) {
         layoutService.removeConnection(id);
-        return ResponseEntity.ok("Connection removed");
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/clear")
