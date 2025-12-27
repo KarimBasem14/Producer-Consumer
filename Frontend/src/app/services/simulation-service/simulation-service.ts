@@ -6,6 +6,7 @@ import { UIStateDTO } from '../../models/UIState';
 import { Queue } from '../../models/Queue.model';
 import { Machine } from '../../models/Machine.model';
 import { Connection } from '../../models/Connection.model';
+import { ToastrService } from 'ngx-toastr';
 import { LayoutService } from '../layout-service/layout-service';
 
 @Injectable({ providedIn: 'root' })
@@ -17,6 +18,7 @@ export class SimulationService {
   private snapshot = inject(SnapshotService);
   private http: HttpClient = inject(HttpClient);
   private konvaService = inject(KonvaService);
+  private toastr = inject(ToastrService);
 
   // Private signals to ensure that no one can edit them from outside
   private _machines = signal<Machine[]>([]);
@@ -91,14 +93,44 @@ export class SimulationService {
             this.konvaService.updateMachineColor(machineIdInt, color);
 
             if (prevColor !== 'white' && color === 'white') {
-              this.konvaService.flashMachine(machineIdInt); 
+              this.konvaService.flashMachine(machineIdInt);
             }
             this.lastMachineColor.set(machineIdInt, color);
           });
+
+          // Check if simulation has finished
+          if (state.isFinished && this.status() === 'running') {
+            this.handleSimulationComplete();
+          }
         },
         error: (err) => console.error('Polling error:', err),
       });
     }, 200);
+  }
+
+  private handleSimulationComplete() {
+    // Stop polling
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = undefined;
+    }
+
+    // Update status
+    this._status.set('stopped');
+
+    // Unlock canvas
+    this.konvaService.unlock();
+
+    // Show success notification
+    this.toastr.success(
+      'All products have been processed successfully!',
+      'Simulation Complete! 🎉',
+      {
+        timeOut: 7000,
+        progressBar: true,
+        closeButton: true,
+      }
+    );
   }
 
 

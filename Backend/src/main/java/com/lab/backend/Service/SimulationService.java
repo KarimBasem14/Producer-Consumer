@@ -94,6 +94,13 @@ public class SimulationService implements SimulationEventListener {
             uiStateDTO.queuesSize.put(q.getKey(), q.getValue().getProducts().size());
         }
 
+        // Check if simulation is finished:
+        // Simulation completes when all products have been generated
+        // (We don't check if queues are empty because output queues accumulate products)
+        boolean allProductsGenerated = currentProductCount >= maxProducts;
+        
+        uiStateDTO.isFinished = running && allProductsGenerated;
+
         return uiStateDTO;
     }
 

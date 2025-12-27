@@ -15,4 +15,5 @@ import java.util.Map;
 public class UIStateDTO {
     public Map<Long, Integer> queuesSize = new HashMap<>();
     public Map<Long, String> machinesColor = new HashMap<>();
+    public boolean isFinished = false;
 }
