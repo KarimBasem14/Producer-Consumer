@@ -39,14 +39,14 @@
     <div class="button-list">
       @let mode = editMode();
 
-      <button (click)="onSetMode('select')" [class.active]="mode === 'select'" class="sidebar-item">
+      <button (click)="onSetMode('select')" [class.active]="editMode() === 'select'" class="sidebar-item">
         <lucide-icon [name]="HandGrab" size="16"></lucide-icon>
         <span>Select & Move</span>
       </button>
 
       <button
         (click)="onSetMode('connect')"
-        [class.active]="mode === 'connect'"
+        [class.active]="editMode() === 'connect'"
         class="sidebar-item"
       >
         <lucide-icon [name]="MoveRight" size="16"></lucide-icon>
@@ -55,7 +55,7 @@
 
       <button
         (click)="onSetMode('delete')"
-        [class.active]="mode === 'delete'"
+        [class.active]="editMode() === 'delete'"
         class="sidebar-item delete-mode"
       >
         <lucide-icon [name]="Trash2" size="16"></lucide-icon>

@@ -52,6 +52,7 @@ export class SideBar {
   }
 
   onSetMode(mode: 'select' | 'connect' | 'delete') {
+    this.simService.setEditMode(mode);
     this.konvaService.setEditMode(mode);
   }
 }

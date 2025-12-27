@@ -35,6 +35,9 @@ export class KonvaService {
       name: 'machine',
     });
 
+    console.log(dto.id);
+    
+
     const circle = new Konva.Circle({
       radius: 35,
       fillRadialGradientStartPoint: { x: -10, y: -10 },
