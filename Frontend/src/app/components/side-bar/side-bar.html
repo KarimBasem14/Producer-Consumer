@@ -10,7 +10,7 @@
   <div class="sidebar-section">
     <h2 class="section-label">Add Components</h2>
     <div class="button-list">
-      <button (click)="onAddMachine()" class="sidebar-item">
+      <button (click)="onAddMachine()" class="sidebar-item" [disabled]="status() === 'running'">
         <div class="icon-container machine-icon">
           <lucide-icon [name]="Circle" size="16"></lucide-icon>
         </div>
@@ -21,7 +21,7 @@
         <lucide-icon [name]="Plus" size="16" class="muted"></lucide-icon>
       </button>
 
-      <button (click)="onAddQueue()" class="sidebar-item">
+      <button (click)="onAddQueue()" class="sidebar-item" [disabled]="status() === 'running'">
         <div class="icon-container queue-icon">
           <lucide-icon [name]="Square" size="16"></lucide-icon>
         </div>
@@ -39,29 +39,20 @@
     <div class="button-list">
       @let mode = editMode();
 
-      <button
-        (click)="onSetMode('select')"
-        [class.active]="editMode() === 'select'"
-        class="sidebar-item"
-      >
+      <button (click)="onSetMode('select')" [class.active]="editMode() === 'select'" [disabled]="status() === 'running'"
+        class="sidebar-item">
         <lucide-icon [name]="HandGrab" size="16"></lucide-icon>
         <span>Select & Move</span>
       </button>
 
-      <button
-        (click)="onSetMode('connect')"
-        [class.active]="editMode() === 'connect'"
-        class="sidebar-item"
-      >
+      <button (click)="onSetMode('connect')" [class.active]="editMode() === 'connect'"
+        [disabled]="status() === 'running'" class="sidebar-item">
         <lucide-icon [name]="MoveRight" size="16"></lucide-icon>
         <span>Connect</span>
       </button>
 
-      <button
-        (click)="onSetMode('delete')"
-        [class.active]="editMode() === 'delete'"
-        class="sidebar-item delete-mode"
-      >
+      <button (click)="onSetMode('delete')" [class.active]="editMode() === 'delete'" [disabled]="status() === 'running'"
+        class="sidebar-item delete-mode">
         <lucide-icon [name]="Trash2" size="16"></lucide-icon>
         <span>Delete</span>
       </button>

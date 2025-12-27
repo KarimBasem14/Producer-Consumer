@@ -96,6 +96,7 @@ export class SimulationService {
   start() {
     this._status.set('running');
     this.prevSimulationExists.set(true);
+    this.konvaService.lock(); // Lock canvas during simulation
     this.http.post(`${this.API_BASE}/start`, {}, { responseType: 'text' }).subscribe({
       next: (response) => {
         console.log('Simulation started:', response);
@@ -105,6 +106,7 @@ export class SimulationService {
       error: (err) => {
         console.error('Failed to start simulation:', err);
         this._status.set('stopped');
+        this.konvaService.unlock(); // Unlock if start fails
       },
     });
   }
@@ -115,6 +117,7 @@ export class SimulationService {
 
   stop() {
     this._status.set('stopped');
+    this.konvaService.unlock(); // Unlock canvas when simulation stops
     if (this.pollingInterval) {
       clearInterval(this.pollingInterval);
     }
@@ -122,6 +125,7 @@ export class SimulationService {
 
   reset() {
     // This /reset call in the backend resets both the layout and the simulation
+    this.konvaService.unlock(); // Unlock canvas before reset
     this.http.post(`${this.API_BASE}/reset`, {}, { responseType: 'text' }).subscribe({
       next: (data) => {
         this._machines.set([]);
