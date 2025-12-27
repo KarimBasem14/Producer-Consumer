@@ -5,6 +5,8 @@ import { SignalZero } from 'lucide-angular';
 import { first } from 'rxjs';
 import { Connection } from '../../models/Connection.model';
 import Konva from 'konva';
+import {SimulationService} from '../simulation-service/simulation-service';
+import {Queue} from '../../models/Queue.model';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +15,7 @@ import Konva from 'konva';
 export class LayoutService {
   private http = inject(HttpClient);
   private konva = inject(KonvaService);
+  private simService = inject(SimulationService);
   private firstSelectedId: number | null = null;
   private firstSelectedType: 'machine' | 'queue' | 'connection' | null = null;
 
@@ -36,6 +39,9 @@ export class LayoutService {
     this.http.post<any>(`${this.API_BASE}/machines/add`, initialData).subscribe({
       next: (savedMachine) => {
         this.konva.drawMachine(savedMachine, this.machineCounter);
+
+        this.simService.addComponent('machine', savedMachine); // update global state
+
         this.machineOffset += this.SHIFT_STEP;
         this.machineCounter++;
       },
@@ -50,9 +56,10 @@ export class LayoutService {
       size: 0,
     };
 
-    this.http.post<any>(`${this.API_BASE}/queues/add`, initialData).subscribe({
+    this.http.post<Queue>(`${this.API_BASE}/queues/add`, initialData).subscribe({
       next: (savedQueue) => {
         this.konva.drawQueue(savedQueue, this.queueCounter);
+        this.simService.addComponent('queue',savedQueue); // Add this line!
         this.queueOffset += this.SHIFT_STEP;
         this.queueCounter++;
       },
@@ -178,7 +185,7 @@ export class LayoutService {
   relatedConnectionIds.forEach((connId) => {
     const arrowId = this.connectionIdMap[connId];
     console.log(connId);
-    if (!arrowId) return; 
+    if (!arrowId) return;
     this.http.delete(`${this.API_BASE}/connections/delete/${connId}`)
       .subscribe({
         next: () => {
@@ -187,6 +194,7 @@ export class LayoutService {
               console.log(connId, this.connectionIdMap[connId]);
 
               this.konva.removeNode(arrowId);
+            this.simService.removeComponent(connId, 'connection'); // update global state
               delete this.connectionIdMap[connId];
             }
         },
@@ -199,19 +207,24 @@ export class LayoutService {
     if (type === 'machine' || type === 'queue') {
     this.deleteConnectionsOfNode(id, type);
   }
-
     if (type === 'machine') {
       this.http
         .delete(`${this.API_BASE}/machines/delete/${id}`, { responseType: 'text' })
         .subscribe({
-          next: () => this.konva.removeNode(`machine-${id}`),
+          next: () => {
+            this.konva.removeNode(`machine-${id}`);
+            this.simService.removeComponent(id, type); // updates global state in simService
+          },
           error: (err) => console.error('Failed to delete machine', err),
         });
     }
 
     if (type === 'queue') {
       this.http.delete(`${this.API_BASE}/queues/delete/${id}`, { responseType: 'text' }).subscribe({
-        next: () => this.konva.removeNode(`queue-${id}`),
+        next: () => {
+          this.konva.removeNode(`queue-${id}`);
+          this.simService.removeComponent(id, type); // updates global state in simService
+        },
         error: (err) => console.error('Failed to delete queue', err),
       });
     }
@@ -228,6 +241,7 @@ export class LayoutService {
               console.log(arrowId, this.connectionIdMap[id]);
 
               this.konva.removeNode(arrowId);
+              this.simService.removeComponent(id, type); // updates global state in simService
               delete this.connectionIdMap[id];
             }
           },

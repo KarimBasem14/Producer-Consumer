@@ -37,6 +37,21 @@ export class SimulationService {
     this._queues().reduce((acc, q) => acc + (q.products?.length || 0), 0)
   );
 
+  // only used to update the app's state
+  addComponent(type: 'machine' | 'queue' | 'connection', data: any) {
+    if (type === 'machine') this._machines.update(list => [...list, data]);
+    if (type === 'queue') this._queues.update(list => [...list, data]);
+    if (type === 'connection') this._connections.update(list => [...list, data]);
+  }
+
+  // only used to update the app's state
+  removeComponent(id: number,type: 'machine' | 'queue' | 'connection') {
+    if (type === 'machine') this._machines.update(list => list.filter(m => m.id !== id));
+    if (type === 'queue') this._queues.update(list => list.filter(q => q.id !== id));
+    // connections might need filtering by string ID or backend ID
+    if (type === 'connection') this._connections.update(list => list.filter(c => c.id !== id));
+  }
+
   updateState(machines: any[], queues: any[], connections: any[]) {
     this._machines.set(machines);
     this._queues.set(queues);
