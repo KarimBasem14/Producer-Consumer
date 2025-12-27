@@ -42,11 +42,22 @@ public class Machine implements Runnable, Observer {
         while (running) {
             Product product = fetchNextProduct();
             if (product != null) {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+                // BUG FIX: Commented out sleep to prevent race condition
+                // The sleep here caused a window where:
+                // 1. Machine fetched product but hasn't set currentProduct yet
+                // 2. Completion check runs and sees currentProduct == null (idle)
+                // 3. Marks simulation complete BEFORE product is processed
+                // 4. Product gets lost or duplicated
+                // 
+                // ORIGINAL CODE (BUGGY):
+                // try {
+                //     Thread.sleep(200);
+                // } catch (InterruptedException e) {
+                //     Thread.currentThread().interrupt();
+                // }
+                
+                // Now we set currentProduct IMMEDIATELY after fetching
+                // This ensures completion check sees the machine as busy
                 setCurrentProduct(product);
                 stateChanged();
                 unregisterFromAllInQueues();

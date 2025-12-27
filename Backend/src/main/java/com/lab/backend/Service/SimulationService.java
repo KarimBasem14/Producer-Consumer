@@ -102,17 +102,30 @@ public class SimulationService implements SimulationEventListener {
         }
 
         // Check if simulation is finished:
-        // 1. All products have been generated (20 products added to system)
-        // 2. Entry queue (Q1) is empty (all products have entered processing)
-        // 3. All machines are idle (no products being processed)
-        // This ensures all products made it through the entire pipeline
+        // Assumption: Highest numbered queue is the output queue
+        // Completion when:
+        // 1. All products generated (producer done)
+        // 2. All machines idle (nothing being processed)
+        // 3. All queues EXCEPT output are empty (no products waiting)
         boolean allProductsGenerated = currentProductCount >= maxProducts;
-        Queue entryQueue = queues.get(1L);
-        boolean entryQueueEmpty = (entryQueue == null || entryQueue.getProducts().isEmpty());
         boolean allMachinesIdle = machines.values().stream()
                 .allMatch(m -> m.getCurrentProduct() == null);
         
-        uiStateDTO.isFinished = running && allProductsGenerated && entryQueueEmpty && allMachinesIdle;
+        // Find the highest queue ID (assumed to be output)
+        Long maxQueueId = queues.keySet().stream()
+                .max(Long::compareTo)
+                .orElse(1L);
+        
+        // Check all queues except the max (output) are empty
+        boolean allInputQueuesEmpty = queues.entrySet().stream()
+                .filter(entry -> !entry.getKey().equals(maxQueueId))
+                .allMatch(entry -> entry.getValue().getProducts().isEmpty());
+        
+        uiStateDTO.isFinished = running && allProductsGenerated && allMachinesIdle && allInputQueuesEmpty;
+
+        if (uiStateDTO.isFinished) {
+            System.out.println("🎉 SIMULATION MARKED AS FINISHED!");
+        }
 
         return uiStateDTO;
     }
