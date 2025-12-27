@@ -76,6 +76,8 @@ export class SimulationService {
             return queues.map(q => {
               const size = state.queuesSize[q.id];
               if (size !== undefined) {
+                // Update the visual representation
+                this.konvaService.updateQueueSize(q.id, size);
                 return { ...q, size: size };
               }
               return q;

@@ -251,4 +251,18 @@ export class KonvaService {
       }
     }
   }
+
+  updateQueueSize(queueId: number, newSize: number) {
+    const group = this.stage.findOne(`#queue-${queueId}`) as Konva.Group;
+
+    if (group) {
+      const text = group.findOne('Text') as Konva.Text;
+
+      if (text) {
+        // Update text to show new size
+        text.text(`Q${queueId}\n${newSize} P`);
+        this.layer.batchDraw();
+      }
+    }
+  }
 }
