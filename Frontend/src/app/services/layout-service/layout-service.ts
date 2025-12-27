@@ -5,8 +5,8 @@ import { SignalZero } from 'lucide-angular';
 import { first } from 'rxjs';
 import { Connection } from '../../models/Connection.model';
 import Konva from 'konva';
-import {SimulationService} from '../simulation-service/simulation-service';
-import {Queue} from '../../models/Queue.model';
+import { SimulationService } from '../simulation-service/simulation-service';
+import { Queue } from '../../models/Queue.model';
 
 @Injectable({
   providedIn: 'root',
@@ -59,7 +59,7 @@ export class LayoutService {
     this.http.post<Queue>(`${this.API_BASE}/queues/add`, initialData).subscribe({
       next: (savedQueue) => {
         this.konva.drawQueue(savedQueue, this.queueCounter);
-        this.simService.addComponent('queue',savedQueue); // Add this line!
+        this.simService.addComponent('queue', savedQueue); // Add this line!
         this.queueOffset += this.SHIFT_STEP;
         this.queueCounter++;
       },
@@ -124,13 +124,20 @@ export class LayoutService {
       const targetId = id;
       const sourceType = this.firstSelectedType;
       const targetType = type;
-      // console.log(`Source ${sourceId} selected. target ${targetId} Selected.`);
+
       this.firstSelectedId = null;
       this.firstSelectedType = null;
 
       if (!sourceType || !targetType) {
         console.log('Invalid source or target type.');
         return;
+      }
+
+      if (sourceType === 'machine') {
+        if (this.machineHasConnection(sourceId)) {
+          console.log(`Machine ${sourceId} is already connected to a queue.`);
+          return;
+        }
       }
 
       if (sourceType === targetType) {
@@ -176,37 +183,35 @@ export class LayoutService {
   }
 
   private deleteConnectionsOfNode(nodeId: number, nodeType: 'machine' | 'queue') {
-  // Find all connection IDs related to this node
-  const relatedConnectionIds = Object.entries(this.connectionIdMap)
-    .filter(([connId, arrowId]) => arrowId.includes(`${nodeType}-${nodeId}`))
-    .map(([connId]) => Number(connId));
+    // Find all connection IDs related to this node
+    const relatedConnectionIds = Object.entries(this.connectionIdMap)
+      .filter(([connId, arrowId]) => arrowId.includes(`${nodeType}-${nodeId}`))
+      .map(([connId]) => Number(connId));
 
-  // Delete each connection from backend and remove from Konva
-  relatedConnectionIds.forEach((connId) => {
-    const arrowId = this.connectionIdMap[connId];
-    console.log(connId);
-    if (!arrowId) return;
-    this.http.delete(`${this.API_BASE}/connections/delete/${connId}`)
-      .subscribe({
+    // Delete each connection from backend and remove from Konva
+    relatedConnectionIds.forEach((connId) => {
+      const arrowId = this.connectionIdMap[connId];
+      console.log(connId);
+      if (!arrowId) return;
+      this.http.delete(`${this.API_BASE}/connections/delete/${connId}`).subscribe({
         next: () => {
           if (arrowId) {
+            console.log(connId, this.connectionIdMap[connId]);
 
-              console.log(connId, this.connectionIdMap[connId]);
-
-              this.konva.removeNode(arrowId);
+            this.konva.removeNode(arrowId);
             this.simService.removeComponent(connId, 'connection'); // update global state
-              delete this.connectionIdMap[connId];
-            }
+            delete this.connectionIdMap[connId];
+          }
         },
-        error: (err) => console.error('Failed to delete connection', err)
+        error: (err) => console.error('Failed to delete connection', err),
       });
-  });
-}
+    });
+  }
 
   deleteComponent(id: number, type: 'machine' | 'queue' | 'connection') {
     if (type === 'machine' || type === 'queue') {
-    this.deleteConnectionsOfNode(id, type);
-  }
+      this.deleteConnectionsOfNode(id, type);
+    }
     if (type === 'machine') {
       this.http
         .delete(`${this.API_BASE}/machines/delete/${id}`, { responseType: 'text' })
@@ -230,23 +235,21 @@ export class LayoutService {
     }
     if (type === 'connection') {
       const arrowId = this.connectionIdMap[id];
-      this.http
-        .delete(`${this.API_BASE}/connections/delete/${id}`)
-        .subscribe({
-          next: () => {
-            if (arrowId) {
-              const arrow = this.konva.findShapeBySelector(`#${arrowId}`);
-              console.log('Arrow to delete:', arrow);
+      this.http.delete(`${this.API_BASE}/connections/delete/${id}`).subscribe({
+        next: () => {
+          if (arrowId) {
+            const arrow = this.konva.findShapeBySelector(`#${arrowId}`);
+            console.log('Arrow to delete:', arrow);
 
-              console.log(arrowId, this.connectionIdMap[id]);
+            console.log(arrowId, this.connectionIdMap[id]);
 
-              this.konva.removeNode(arrowId);
-              this.simService.removeComponent(id, type); // updates global state in simService
-              delete this.connectionIdMap[id];
-            }
-          },
-          error: (err) => console.error('Failed to delete layout', err),
-        });
+            this.konva.removeNode(arrowId);
+            this.simService.removeComponent(id, type); // updates global state in simService
+            delete this.connectionIdMap[id];
+          }
+        },
+        error: (err) => console.error('Failed to delete layout', err),
+      });
     }
   }
   private connectionExists(id1: number, type1: string, id2: number, type2: string): boolean {
@@ -256,6 +259,15 @@ export class LayoutService {
     return allArrows.some((arrow) => {
       const arrowId = arrow.id();
       return arrowId.includes(patternA) && arrowId.includes(patternB);
+    });
+  }
+
+  private machineHasConnection(machineId: number): boolean {
+    const pattern = `-machine-${machineId}`;
+    const allArrows = this.konva.findShapeBySelector('Arrow') as any[];
+    return [...allArrows].some((arrow) => {
+      const arrowId = arrow.id();
+      return arrowId && arrowId.includes(pattern);
     });
   }
 
