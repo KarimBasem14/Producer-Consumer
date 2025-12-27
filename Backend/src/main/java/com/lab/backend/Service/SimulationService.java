@@ -94,6 +94,14 @@ public class SimulationService implements SimulationEventListener {
     }
 
     private void startThreads(){
+        machines.values().forEach(machine -> {
+            if (!machine.isReady()) {
+                throw new IllegalStateException(
+                        "Machine not ready: missing input or output queue"
+                );
+            }
+        });
+
         machines.values().forEach(machine->{
             Thread t = new Thread(machine);
             machineThreads.add(t);

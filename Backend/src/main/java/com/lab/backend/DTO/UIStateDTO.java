@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Setter
@@ -12,6 +13,6 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UIStateDTO {
-    public Map<Long, Integer> queuesSize;
-    public Map<Long, String> machinesColor;
+    public Map<Long, Integer> queuesSize = new HashMap<>();
+    public Map<Long, String> machinesColor = new HashMap<>();
 }
