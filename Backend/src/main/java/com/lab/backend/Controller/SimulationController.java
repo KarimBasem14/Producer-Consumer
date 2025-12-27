@@ -33,14 +33,28 @@ public class SimulationController {
         return ResponseEntity.ok(simulationService.getCurrentState());
     }
 
+//    @PostMapping("/replay")
+//    public ResponseEntity<String> replaySimulation() {
+//        try {
+//            simulationService.replay();
+//            return ResponseEntity.ok("Replay finished");
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//            return ResponseEntity.internalServerError().body("Replay interrupted");
+//        }
+//    }
+
     @PostMapping("/replay")
     public ResponseEntity<String> replaySimulation() {
-        try {
-            simulationService.replay();
-            return ResponseEntity.ok("Replay finished");
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return ResponseEntity.internalServerError().body("Replay interrupted");
-        }
+        new Thread(() -> {
+            try {
+                simulationService.replay();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+
+        return ResponseEntity.ok("Replay started");
     }
+
 }
