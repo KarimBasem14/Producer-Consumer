@@ -164,6 +164,22 @@ public class LayoutService {
     }
 
     public void setUpSimulation(Map<Long, Machine> machinesModels, Map<Long, Queue> queuesModels){
+        for(QueueDTO q : queues.values()) {
+            System.out.println("queueDTO id: " + q.id);
+        }
+
+        System.out.println();
+
+        for(MachineDTO m : machines.values()) {
+            System.out.println("machineDTO id: " + m.id);
+        }
+
+        System.out.println();
+
+        for(ConnectionDTO c : connections.values()) {
+            System.out.println("connectionDTO id: " + c.id);
+            System.out.println("Connection from: " + c.fromId + " to: " + c.toId + " direction: " + c.direction);
+        }
         queues.forEach((id, dto) -> {
             Queue liveQueue = new Queue();
             queuesModels.put(id, liveQueue);
