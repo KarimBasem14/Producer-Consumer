@@ -161,6 +161,7 @@ export class SimulationService {
   start() {
     this._status.set('running');
     this.prevSimulationExists.set(true);
+    this.lastMachineColor.clear();
     this.konvaService.lock(); // Lock canvas during simulation
     this.http.post(`${this.API_BASE}/start`, {}, { responseType: 'text' }).subscribe({
       next: (response) => {
@@ -207,10 +208,38 @@ export class SimulationService {
     });
   }
 
-  handleReplay(index: number) {
-    const pastState = this.snapshot.getSnapshot(index);
-    if (pastState) {
-      this.updateState(pastState.machines, pastState.queues, pastState.connections);
-    }
+  handleReplay() {
+if (!this.prevSimulationExists()) {
+    this.toastr.warning('No previous simulation to replay');
+    return;
+  }
+
+  // Stop any existing polling
+  if (this.pollingInterval) {
+    clearInterval(this.pollingInterval);
+    this.pollingInterval = undefined;
+  }
+
+  this.konvaService.lock();
+
+  this._status.set('running');
+
+  // Reset last known colors flashhhhing
+  this.lastMachineColor.clear();
+
+  this.startPolling();
+
+  this.http.post(`${this.API_BASE}/replay`, {}, { responseType: 'text' })
+    .subscribe({
+      next: (res) => {
+        console.log('Replay started:', res);
+      },
+      error: (err) => {
+        console.error('Replay failed', err);
+        this.toastr.error('Replay failed');
+        this._status.set('stopped');
+        this.konvaService.unlock();
+      }
+    });
   }
 }

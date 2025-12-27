@@ -14,7 +14,6 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-angular';
-import { LayoutService } from '../../services/layout-service/layout-service';
 
 @Component({
   selector: 'app-top-bar',
@@ -25,7 +24,6 @@ import { LayoutService } from '../../services/layout-service/layout-service';
 export class TopBar {
   public simService = inject(SimulationService);
   private snapshotService = inject(SnapshotService);
-  private layoutService = inject(LayoutService);
 
   // Icon Mappings
   readonly Play = Play;
@@ -58,14 +56,16 @@ export class TopBar {
     this.simService.reset();
   }
 
-  replaySimulation() {}
-
-  loadSnapshot(index: number) {
-    this.simService.handleReplay(index);
+  replaySimulation() {
+    this.simService.handleReplay();
   }
 
+  // loadSnapshot(index: number) {
+  //   this.simService.handleReplay(index);
+  // }
+
   handleAddProducts() {
-    this.layoutService.incProductsNumber();
+    // TODO: Logic to trigger random product arrival at Q0
   }
 
   resetLayout() {}
