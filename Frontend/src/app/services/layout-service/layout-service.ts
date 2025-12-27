@@ -110,14 +110,14 @@ export class LayoutService {
     if (this.firstSelectedId === null) {
       this.firstSelectedId = id;
       this.firstSelectedType = type;
-      console.log(`Source ${id} selected. Click target.`);
+      // console.log(`Source ${id} selected. Click target.`);
       // You could call a konva method here to make the shape "glow"
     } else {
       const sourceId = this.firstSelectedId;
       const targetId = id;
       const sourceType = this.firstSelectedType;
       const targetType = type;
-      console.log(`Source ${sourceId} selected. target ${targetId} Selected.`);
+      // console.log(`Source ${sourceId} selected. target ${targetId} Selected.`);
       this.firstSelectedId = null;
       this.firstSelectedType = null;
 
@@ -177,15 +177,14 @@ export class LayoutService {
   // Delete each connection from backend and remove from Konva
   relatedConnectionIds.forEach((connId) => {
     const arrowId = this.connectionIdMap[connId];
+    console.log(connId);
     if (!arrowId) return; 
-    this.http.delete(`${this.API_BASE}/connections/delete/${connId}`, { responseType: 'text' })
+    this.http.delete(`${this.API_BASE}/connections/delete/${connId}`)
       .subscribe({
         next: () => {
           if (arrowId) {
-              const arrow = this.konva.findShapeBySelector(`#${arrowId}`);
-              console.log('Arrow to delete:', arrow);
 
-              console.log(arrowId, this.connectionIdMap[connId]);
+              console.log(connId, this.connectionIdMap[connId]);
 
               this.konva.removeNode(arrowId);
               delete this.connectionIdMap[connId];
@@ -219,7 +218,7 @@ export class LayoutService {
     if (type === 'connection') {
       const arrowId = this.connectionIdMap[id];
       this.http
-        .delete(`${this.API_BASE}/connections/delete/${id}`, { responseType: 'text' })
+        .delete(`${this.API_BASE}/connections/delete/${id}`)
         .subscribe({
           next: () => {
             if (arrowId) {

@@ -53,7 +53,7 @@ export class KonvaService {
     });
 
     const label = new Konva.Text({
-      text: `M${counter}`,
+      text: `M${dto.id}`,
       fontSize: 16,
       fontFamily: 'Inter, Arial',
       fontStyle: 'bold',
@@ -104,7 +104,7 @@ export class KonvaService {
     });
 
     const text = new Konva.Text({
-      text: `Q${counter}\n${dto.size} P`,
+      text: `Q${dto.id}\n${dto.size} P`,
       fontSize: 14,
       fontFamily: 'Inter, Arial',
       fill: 'white',
