@@ -167,11 +167,13 @@ public class LayoutService {
         queues.forEach((id, dto) -> {
             Queue liveQueue = new Queue();
             queuesModels.put(id, liveQueue);
+            System.out.println("queue" + id);
         });
 
         machines.forEach((id, dto) -> {
             Machine liveMachine = new Machine(getRandomServiceTime(), listener);
             machinesModels.put(id, liveMachine);
+            System.out.println("machine" + id);
         });
 
         connections.forEach((id, conn) -> {
@@ -189,6 +191,7 @@ public class LayoutService {
         if (conn.getDirection() == 1) { // Queue -> Machine
             Queue source = queuesModels.get(conn.getFromId());
             Machine target = machinesModels.get(conn.getToId());
+            System.out.println("conn from q" + conn.getFromId() +  " to q" + conn.getToId());
 
             if (source != null && target != null) {
                 source.registerObserver(target);
@@ -197,6 +200,7 @@ public class LayoutService {
         } else if (conn.getDirection() == 0) { // Machine -> Queue
             Machine source = machinesModels.get(conn.getFromId());
             Queue target = queuesModels.get(conn.getToId());
+            System.out.println("conn from q" + conn.getFromId() + " to q" + conn.getToId());
 
             if (source != null && target != null) {
                 source.setOutputQueue(target);

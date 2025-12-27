@@ -43,6 +43,9 @@ public class SimulationService implements SimulationEventListener {
         machines.clear();
         queues.clear();
         layoutService.setUpSimulation(machines, queues);
+        for (Queue queue : queues.values()) {
+            System.out.println("hi");
+        }
         startThreads();
     }
 
