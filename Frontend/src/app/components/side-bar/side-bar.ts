@@ -31,7 +31,9 @@ export class SideBar {
   public machines = this.simService.machines;
   public queues = this.simService.queues;
   public connections = this.simService.connections;
-  // public totalProducts = this.simService.totalProducts;
+  public totalProducts = this.layoutService.numberOfProducts;
+
+  public status = this.simService.status; // Expose status to disable buttons during simulation
 
   // Icons mapping
   readonly Circle = Circle;

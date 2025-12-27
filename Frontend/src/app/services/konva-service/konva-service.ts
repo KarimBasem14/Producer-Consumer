@@ -11,6 +11,7 @@ export class KonvaService {
   public editMode = this._editMode.asReadonly();
   private stage!: Konva.Stage;
   private layer!: Konva.Layer;
+  private isLocked = false;
 
   initialize(container: string) {
     this.stage = new Konva.Stage({
@@ -297,4 +298,25 @@ export class KonvaService {
   }, 300);
 }
 
+  lock() {
+    this.isLocked = true;
+    // Disable dragging on all machines and queues
+    const allGroups = this.stage.find('Group') as Konva.Group[];
+    allGroups.forEach((group) => {
+      if (group.name() === 'machine' || group.name() === 'queue') {
+        group.draggable(false);
+      }
+    });
+  }
+
+  unlock() {
+    this.isLocked = false;
+    // Re-enable dragging on all machines and queues
+    const allGroups = this.stage.find('Group') as Konva.Group[];
+    allGroups.forEach((group) => {
+      if (group.name() === 'machine' || group.name() === 'queue') {
+        group.draggable(true);
+      }
+    });
+  }
 }
