@@ -6,6 +6,7 @@ import { UIStateDTO } from '../../models/UIState';
 import { Queue } from '../../models/Queue.model';
 import { Machine } from '../../models/Machine.model';
 import { Connection } from '../../models/Connection.model';
+import { LayoutService } from '../layout-service/layout-service';
 
 @Injectable({ providedIn: 'root' })
 export class SimulationService {
@@ -35,11 +36,6 @@ export class SimulationService {
   private readonly API_BASE = 'http://localhost:8080/simulation';
 
   private pollingInterval?: any;
-
-  // Derived state for the Sidebar stats
-  // public totalProducts = computed(() =>
-  //   // this._queues().reduce((acc, q) => acc + (q.products?.length || 0), 0)
-  // );
 
   // only used to update the app's state
   addComponent(type: 'machine' | 'queue' | 'connection', data: any) {
