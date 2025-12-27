@@ -88,7 +88,8 @@ public class Machine implements Runnable, Observer {
 
     private void process(Product product) {
         try {
-            Thread.sleep(this.processingTime*1000L);
+            long delay = (long)(this.processingTime * 1000 / com.lab.backend.Service.SimulationService.speedMultiplier);
+            Thread.sleep(delay);
         }catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

@@ -26,6 +26,9 @@ public class SimulationService implements SimulationEventListener {
     boolean running = false;
     private int maxProducts = 20;
     private int currentProductCount = 0;
+    
+    // Static speed multiplier accessible by Machine threads
+    public static double speedMultiplier = 1.0;
 
     private final SnapshotManager snapshotManager = new SnapshotManager();
 
@@ -35,6 +38,10 @@ public class SimulationService implements SimulationEventListener {
     @Override
     public synchronized void onStateChanged() {
         takeSnapshot();
+    }
+    
+    public void setSpeed(double multiplier) {
+        speedMultiplier = Math.max(0.1, Math.min(10.0, multiplier));
     }
 
     // called by the controller when starting the simulation
@@ -95,11 +102,17 @@ public class SimulationService implements SimulationEventListener {
         }
 
         // Check if simulation is finished:
-        // Simulation completes when all products have been generated
-        // (We don't check if queues are empty because output queues accumulate products)
+        // 1. All products have been generated (20 products added to system)
+        // 2. Entry queue (Q1) is empty (all products have entered processing)
+        // 3. All machines are idle (no products being processed)
+        // This ensures all products made it through the entire pipeline
         boolean allProductsGenerated = currentProductCount >= maxProducts;
+        Queue entryQueue = queues.get(1L);
+        boolean entryQueueEmpty = (entryQueue == null || entryQueue.getProducts().isEmpty());
+        boolean allMachinesIdle = machines.values().stream()
+                .allMatch(m -> m.getCurrentProduct() == null);
         
-        uiStateDTO.isFinished = running && allProductsGenerated;
+        uiStateDTO.isFinished = running && allProductsGenerated && entryQueueEmpty && allMachinesIdle;
 
         return uiStateDTO;
     }
@@ -138,7 +151,8 @@ public class SimulationService implements SimulationEventListener {
                 int min = 1;
                 int max = 5;
                 int randomTime = (int)Math.floor(Math.random() *(max - min + 1) + min);
-                Thread.sleep(randomTime*1000L);
+                long delay = (long)(randomTime * 1000 / speedMultiplier);
+                Thread.sleep(delay);
                 Product p = new Product((long)currentProductCount);
                 Queue q0 = queues.get(1L);
                 if (q0 != null) {

@@ -32,6 +32,12 @@ public class SimulationController {
     public ResponseEntity<UIStateDTO> getCurrentState() {
         return ResponseEntity.ok(simulationService.getCurrentState());
     }
+    
+    @PostMapping("/speed")
+    public ResponseEntity<String> setSpeed(@RequestParam double multiplier) {
+        simulationService.setSpeed(multiplier);
+        return ResponseEntity.ok("Speed set to " + multiplier + "x");
+    }
 
     @PostMapping("/replay")
     public ResponseEntity<String> replaySimulation() {
