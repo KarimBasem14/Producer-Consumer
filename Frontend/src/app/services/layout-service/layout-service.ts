@@ -263,7 +263,7 @@ export class LayoutService {
   }
 
   private machineHasConnection(machineId: number): boolean {
-    const pattern = `-machine-${machineId}`;
+    const pattern = `-machine-${machineId}-`;
     const allArrows = this.konva.findShapeBySelector('Arrow') as any[];
     return [...allArrows].some((arrow) => {
       const arrowId = arrow.id();

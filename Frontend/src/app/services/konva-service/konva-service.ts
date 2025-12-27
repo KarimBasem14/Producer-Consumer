@@ -87,7 +87,6 @@ export class KonvaService {
 
     console.log(`q${dto.id}`);
 
-
     const rect = new Konva.Rect({
       width: 70,
       height: 50,
@@ -251,7 +250,6 @@ export class KonvaService {
     const group = this.stage.findOne(`#machine-${machineId}`) as Konva.Group;
 
     if (group) {
-
       // the group contains a circle (the machine) and a label in the circle
       // we want to update the circle's color
       const circle = group.findOne('Circle') as Konva.Circle;
@@ -262,6 +260,23 @@ export class KonvaService {
         circle.fillRadialGradientColorStops([0, 'white', 1, newColor]);
 
         // redraw
+        this.layer.batchDraw();
+      }
+    }
+  }
+
+  updateQueueText(queueId: number, newSize: number) {
+    const group = this.stage.findOne(`#queue-${queueId}`) as Konva.Group;
+
+    if (group) {
+      // Find the Text object within that group
+      const textNode = group.findOne('Text') as Konva.Text;
+
+      if (textNode) {
+        // Update the text content to show the new size
+        textNode.text(`Q${queueId}\n${newSize} P`);
+
+        // Request a redraw of the layer to show the change
         this.layer.batchDraw();
       }
     }

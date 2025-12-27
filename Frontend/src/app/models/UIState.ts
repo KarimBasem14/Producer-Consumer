@@ -1,4 +1,4 @@
 export interface UIStateDTO {
-  queuesSize: { [key: string]: number };
-  machinesColor: { [key: string]: string };
+  queuesSize: { [key: number]: number };
+  machinesColor: { [key: number]: string };
 }
