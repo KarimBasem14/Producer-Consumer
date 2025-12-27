@@ -14,6 +14,24 @@
   gap: 0.75rem;
 }
 
+/* app/components/top-bar/top-bar.css */
+.replay-btn {
+  background-color: #8b5cf6; /* Indigo/Purple color for Replay */
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.replay-btn:hover:not(:disabled) {
+  background-color: #7c3aed;
+  filter: brightness(1.1);
+}
+
+/* .replay-btn:disabled {
+  background-color: hsl(var(--muted));
+  opacity: 0.5;
+  cursor: not-allowed;
+} */
+
 .button-strip {
   display: flex;
   align-items: center;
@@ -47,4 +65,7 @@
   gap: 0.5rem;
 }
 
-.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
