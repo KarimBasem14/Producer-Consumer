@@ -16,6 +16,12 @@ public class LayoutController {
     @Autowired
     private LayoutService layoutService;
 
+    @PostMapping("/products/add")
+    public ResponseEntity<Integer> addQueue(@RequestBody int number) {
+        int num = layoutService.setProductsNumber(number);
+        return ResponseEntity.ok(num);
+    }
+
     // queues
     @PostMapping("/queues/add")
     public ResponseEntity<QueueDTO> addQueue(@RequestBody QueueDTO queueDTO) {

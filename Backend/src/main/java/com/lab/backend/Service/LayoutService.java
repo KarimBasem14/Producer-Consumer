@@ -1,7 +1,9 @@
 package com.lab.backend.Service;
 import com.lab.backend.Model.Machine;
 import com.lab.backend.Model.Queue;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ public class LayoutService {
     private long nextConnectionId = 1;
     private long nextQueueId = 1;
     private long nextMachineId = 1;
+
+    private int productsNumber = 20;
 
 
     private final SimulationEventListener listener;
@@ -153,6 +157,17 @@ public class LayoutService {
         this.isLocked = locked;
     }
 
+    public int setProductsNumber(int productsNumber) {
+        if(productsNumber <= 0 || productsNumber > 1000){
+            this.productsNumber = 20;
+            return this.productsNumber;
+        }
+
+        this.productsNumber = productsNumber;
+        return this.productsNumber;
+    }
+
+
     public void reset() {
         this.isLocked = false;
         queues.clear();
@@ -163,18 +178,7 @@ public class LayoutService {
         nextMachineId = 1;
     }
 
-    public void setUpSimulation(Map<Long, Machine> machinesModels, Map<Long, Queue> queuesModels){
-        for(QueueDTO q : queues.values()) {
-            System.out.println("queueDTO id: " + q.id);
-        }
-
-        System.out.println();
-
-        for(MachineDTO m : machines.values()) {
-            System.out.println("machineDTO id: " + m.id);
-        }
-
-        System.out.println();
+    public int setUpSimulation(Map<Long, Machine> machinesModels, Map<Long, Queue> queuesModels){
 
         for(ConnectionDTO c : connections.values()) {
             System.out.println("connectionDTO id: " + c.id);
@@ -193,6 +197,7 @@ public class LayoutService {
         connections.forEach((id, conn) -> {
             setupConnection(machinesModels, queuesModels, conn);
         });
+        return this.productsNumber;
     }
 
     private int getRandomServiceTime() {

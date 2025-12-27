@@ -45,7 +45,7 @@ public class SimulationService implements SimulationEventListener {
         layoutService.setLocked(true);
         machines.clear();
         queues.clear();
-        layoutService.setUpSimulation(machines, queues);
+        maxProducts = layoutService.setUpSimulation(machines, queues);
 
         startThreads();
     }
@@ -131,7 +131,7 @@ public class SimulationService implements SimulationEventListener {
                 int min = 1;
                 int max = 5;
                 int randomTime = (int)Math.floor(Math.random() *(max - min + 1) + min);
-                Thread.sleep(randomTime);
+                Thread.sleep(randomTime*1000L);
                 Product p = new Product((long)currentProductCount);
                 Queue q0 = queues.get(1L);
                 if (q0 != null) {
