@@ -35,6 +35,8 @@ export class SimulationService {
   public editMode = this._editMode.asReadonly();
   public status = this._status.asReadonly();
 
+  private lastMachineColor = new Map<number, string>();
+
   private readonly API_BASE = 'http://localhost:8080/simulation';
 
   private pollingInterval?: any;
@@ -86,7 +88,14 @@ export class SimulationService {
           });
 
           Object.entries(state.machinesColor).forEach(([machineId, color]) => {
-            this.konvaService.updateMachineColor(Number(machineId), color);
+            const machineIdInt = Number(machineId);
+            const prevColor = this.lastMachineColor.get(machineIdInt) || 'white';
+            this.konvaService.updateMachineColor(machineIdInt, color);
+
+            if (prevColor !== 'white' && color === 'white') {
+              this.konvaService.flashMachine(machineIdInt);
+            }
+            this.lastMachineColor.set(machineIdInt, color);
           });
 
           // Check if simulation has finished
@@ -123,6 +132,9 @@ export class SimulationService {
       }
     );
   }
+
+
+
 
   // Coordination logic
   start() {
