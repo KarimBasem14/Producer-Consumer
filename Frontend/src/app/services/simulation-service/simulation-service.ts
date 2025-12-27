@@ -1,8 +1,8 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { KonvaService } from '../konva-service/konva-service';
 import { SnapshotService } from '../snapshot-service/snapshot-service';
-import {HttpClient} from '@angular/common/http';
-import {UIStateDTO} from '../../models/UIState';
+import { HttpClient } from '@angular/common/http';
+import { UIStateDTO } from '../../models/UIState';
 
 @Injectable({ providedIn: 'root' })
 export class SimulationService {
@@ -45,7 +45,7 @@ export class SimulationService {
   }
 
   // only used to update the app's state
-  removeComponent(id: number,type: 'machine' | 'queue' | 'connection') {
+  removeComponent(id: number, type: 'machine' | 'queue' | 'connection') {
     if (type === 'machine') this._machines.update(list => list.filter(m => m.id !== id));
     if (type === 'queue') this._queues.update(list => list.filter(q => q.id !== id));
     // connections might need filtering by string ID or backend ID
@@ -70,20 +70,22 @@ export class SimulationService {
       this.http.get<any>(`${this.API_BASE}/state`).subscribe({
         next: (state) => {
 
-          // update queue sizes
+          // Backend returns queuesSize as Map<Long, Integer> (object in JSON)
+          // Update queue sizes from the map
           this._queues.update(queues => {
             return queues.map(q => {
-              const backendQueue = state.queues.find((bq: any) => bq.id === q.id); // we should probably change that as that's very slow!
-              if (backendQueue) {
-                return { ...q, size: backendQueue.size };
+              const size = state.queuesSize[q.id];
+              if (size !== undefined) {
+                return { ...q, size: size };
               }
               return q;
             });
           });
 
-          // update machine colors through konva service
-          state.machineColors.forEach((colorData: any) => {
-            this.konvaService.updateMachineColor(colorData.machineId, colorData.color);
+          // Backend returns machinesColor as Map<Long, String> (object in JSON)
+          // Update machine colors through konva service
+          Object.entries(state.machinesColor).forEach(([machineId, color]: [string, any]) => {
+            this.konvaService.updateMachineColor(Number(machineId), color);
           });
         },
         error: (err) => console.error('Polling error:', err)
@@ -123,7 +125,7 @@ export class SimulationService {
   reset() {
 
     // This /reset call in the backend resets both the layout and the simulation
-    this.http.post(`${this.API_BASE}/reset`,{}, { responseType: 'text' }).subscribe(
+    this.http.post(`${this.API_BASE}/reset`, {}, { responseType: 'text' }).subscribe(
       {
         next: (data) => {
           this._machines.set([]);
