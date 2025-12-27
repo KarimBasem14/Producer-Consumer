@@ -27,6 +27,7 @@ export class SimulationService {
   private _editMode = signal<'select' | 'connect' | 'delete'>('select');
   private _status = signal<'running' | 'paused' | 'stopped'>('stopped');
   public prevSimulationExists = signal<boolean>(false);
+  private _speed = signal<number>(1);
 
   // Read-only signals for the UI
   public machines = this._machines.asReadonly();
@@ -34,6 +35,7 @@ export class SimulationService {
   public connections = this._connections.asReadonly();
   public editMode = this._editMode.asReadonly();
   public status = this._status.asReadonly();
+  public speed = this._speed.asReadonly();
 
   private lastMachineColor = new Map<number, string>();
 
@@ -67,12 +69,26 @@ export class SimulationService {
     this._editMode.set(mode);
   }
 
+  setSpeed(speed: number) {
+    this._speed.set(speed);
+    this.http.post(`${this.API_BASE}/speed?multiplier=${speed}`, {}, { responseType: 'text' })
+      .subscribe({
+        next: () => console.log('Speed set to ' + speed + 'x'),
+        error: (err) => console.error('Failed to set speed:', err)
+      });
+  }
+
   // updates the ui every 200ms
   private startPolling() {
     this.pollingInterval = setInterval(() => {
       this.http.get<UIStateDTO>(`${this.API_BASE}/state`).subscribe({
         next: (state) => {
           console.log(state);
+
+          // Debug: Log when isFinished changes
+          if (state.isFinished) {
+            console.log('🎉 SIMULATION FINISHED DETECTED!', state);
+          }
 
           this._queues.update((queues) => {
             return queues.map((q) => {
@@ -100,7 +116,8 @@ export class SimulationService {
 
           // Check if simulation has finished
           if (state.isFinished && this.status() === 'running') {
-            // this.handleSimulationComplete();
+            console.log('🚀 Calling handleSimulationComplete()');
+            this.handleSimulationComplete();
           }
         },
         error: (err) => console.error('Polling error:', err),
@@ -109,6 +126,8 @@ export class SimulationService {
   }
 
   private handleSimulationComplete() {
+    console.log('✅ handleSimulationComplete() called');
+
     // Stop polling
     if (this.pollingInterval) {
       clearInterval(this.pollingInterval);
@@ -122,6 +141,7 @@ export class SimulationService {
     this.konvaService.unlock();
 
     // Show success notification
+    console.log('📢 Showing toast notification...');
     this.toastr.success(
       'All products have been processed successfully!',
       'Simulation Complete! 🎉',
@@ -131,6 +151,7 @@ export class SimulationService {
         closeButton: true,
       }
     );
+    console.log('Toast should be visible now');
   }
 
 

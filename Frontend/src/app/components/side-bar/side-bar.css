@@ -92,6 +92,7 @@
   background: hsl(var(--primary) / 0.15);
   color: hsl(var(--primary));
 }
+
 .queue-icon {
   background: hsl(var(--sidebar-foreground) / 0.1);
 }
@@ -106,6 +107,7 @@
   font-size: 0.85rem;
   font-weight: 500;
 }
+
 .item-desc {
   font-size: 0.7rem;
   color: hsl(var(--muted-foreground));
@@ -126,4 +128,9 @@
 .stat-row {
   display: flex;
   justify-content: space-between;
+}
+
+.speed-slider {
+  width: 100%;
+  cursor: pointer;
 }

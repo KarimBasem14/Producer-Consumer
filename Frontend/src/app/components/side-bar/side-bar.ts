@@ -34,6 +34,7 @@ export class SideBar {
   public totalProducts = this.layoutService.numberOfProducts;
 
   public status = this.simService.status; // Expose status to disable buttons during simulation
+  public speed = this.simService.speed;
 
   // Icons mapping
   readonly Circle = Circle;
@@ -56,5 +57,10 @@ export class SideBar {
   onSetMode(mode: 'select' | 'connect' | 'delete') {
     this.simService.setEditMode(mode);
     this.konvaService.setEditMode(mode);
+  }
+
+  onSpeedChange(event: Event) {
+    const value = Number((event.target as HTMLInputElement).value);
+    this.simService.setSpeed(value);
   }
 }
