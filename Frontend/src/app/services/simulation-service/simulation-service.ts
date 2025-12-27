@@ -1,8 +1,8 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { KonvaService } from '../konva-service/konva-service';
 import { SnapshotService } from '../snapshot-service/snapshot-service';
-import {HttpClient} from '@angular/common/http';
-import {UIStateDTO} from '../../models/UIState';
+import { HttpClient } from '@angular/common/http';
+import { UIStateDTO } from '../../models/UIState';
 
 @Injectable({ providedIn: 'root' })
 export class SimulationService {
@@ -39,17 +39,17 @@ export class SimulationService {
 
   // only used to update the app's state
   addComponent(type: 'machine' | 'queue' | 'connection', data: any) {
-    if (type === 'machine') this._machines.update(list => [...list, data]);
-    if (type === 'queue') this._queues.update(list => [...list, data]);
-    if (type === 'connection') this._connections.update(list => [...list, data]);
+    if (type === 'machine') this._machines.update((list) => [...list, data]);
+    if (type === 'queue') this._queues.update((list) => [...list, data]);
+    if (type === 'connection') this._connections.update((list) => [...list, data]);
   }
 
   // only used to update the app's state
-  removeComponent(id: number,type: 'machine' | 'queue' | 'connection') {
-    if (type === 'machine') this._machines.update(list => list.filter(m => m.id !== id));
-    if (type === 'queue') this._queues.update(list => list.filter(q => q.id !== id));
+  removeComponent(id: number, type: 'machine' | 'queue' | 'connection') {
+    if (type === 'machine') this._machines.update((list) => list.filter((m) => m.id !== id));
+    if (type === 'queue') this._queues.update((list) => list.filter((q) => q.id !== id));
     // connections might need filtering by string ID or backend ID
-    if (type === 'connection') this._connections.update(list => list.filter(c => c.id !== id));
+    if (type === 'connection') this._connections.update((list) => list.filter((c) => c.id !== id));
   }
 
   updateState(machines: any[], queues: any[], connections: any[]) {
@@ -63,16 +63,18 @@ export class SimulationService {
     this._editMode.set(mode);
   }
 
-
   // updates the ui every 200ms
   private startPolling() {
     this.pollingInterval = setInterval(() => {
       this.http.get<any>(`${this.API_BASE}/state`).subscribe({
         next: (state) => {
+          if (!state || !Array.isArray(state.queues)) {
+            return; // stop infinte logs :(
+          }
 
           // update queue sizes
-          this._queues.update(queues => {
-            return queues.map(q => {
+          this._queues.update((queues) => {
+            return queues.map((q) => {
               const backendQueue = state.queues.find((bq: any) => bq.id === q.id); // we should probably change that as that's very slow!
               if (backendQueue) {
                 return { ...q, size: backendQueue.size };
@@ -86,7 +88,7 @@ export class SimulationService {
             this.konvaService.updateMachineColor(colorData.machineId, colorData.color);
           });
         },
-        error: (err) => console.error('Polling error:', err)
+        error: (err) => console.error('Polling error:', err),
       });
     }, 200);
   }
@@ -94,19 +96,17 @@ export class SimulationService {
   // Coordination logic
   start() {
     this._status.set('running');
-    this.http.post(`${this.API_BASE}/start`, {}, { responseType: 'text' })
-      .subscribe({
-        next: (response) => {
-          console.log('Simulation started:', response);
+    this.http.post(`${this.API_BASE}/start`, {}, { responseType: 'text' }).subscribe({
+      next: (response) => {
+        console.log('Simulation started:', response);
 
-
-          this.startPolling(); // asks the backend for the ui update every 200 ms
-        },
-        error: (err) => {
-          console.error('Failed to start simulation:', err);
-          this._status.set('stopped');
-        }
-      });
+        this.startPolling(); // asks the backend for the ui update every 200 ms
+      },
+      error: (err) => {
+        console.error('Failed to start simulation:', err);
+        this._status.set('stopped');
+      },
+    });
   }
 
   pause() {
@@ -121,24 +121,21 @@ export class SimulationService {
   }
 
   reset() {
-
     // This /reset call in the backend resets both the layout and the simulation
-    this.http.post(`${this.API_BASE}/reset`,{}, { responseType: 'text' }).subscribe(
-      {
-        next: (data) => {
-          this._machines.set([]);
-          this._queues.set([]);
-          this._connections.set([]);
-          this._status.set('stopped');
-          this.konvaService.clear();
-          console.log("Succefully reset simulation and canvas")
-        },
-        error: (err) => {
-          console.error("Failed to reset canvas.");
-          console.error(err);
-        }
-      }
-    );
+    this.http.post(`${this.API_BASE}/reset`, {}, { responseType: 'text' }).subscribe({
+      next: (data) => {
+        this._machines.set([]);
+        this._queues.set([]);
+        this._connections.set([]);
+        this._status.set('stopped');
+        this.konvaService.clear();
+        console.log('Succefully reset simulation and canvas');
+      },
+      error: (err) => {
+        console.error('Failed to reset canvas.');
+        console.error(err);
+      },
+    });
   }
 
   handleReplay(index: number) {
