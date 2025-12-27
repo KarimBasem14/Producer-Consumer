@@ -31,7 +31,7 @@ export class SideBar {
   public machines = this.simService.machines;
   public queues = this.simService.queues;
   public connections = this.simService.connections;
-  public totalProducts = this.simService.totalProducts;
+  // public totalProducts = this.simService.totalProducts;
 
   // Icons mapping
   readonly Circle = Circle;

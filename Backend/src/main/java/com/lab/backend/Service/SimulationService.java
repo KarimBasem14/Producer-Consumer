@@ -3,17 +3,20 @@ import com.lab.backend.DTO.UIStateDTO;
 import com.lab.backend.Model.Machine;
 import com.lab.backend.Model.Product;
 import com.lab.backend.Model.Queue;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.lab.backend.snapshot.SimulationState;
 import com.lab.backend.snapshot.SnapshotManager;
 
+import javax.xml.stream.events.EntityReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
+@Slf4j
 @Service
 public class SimulationService implements SimulationEventListener {
     private Map<Long, Machine> machines = new HashMap<>();
@@ -43,6 +46,7 @@ public class SimulationService implements SimulationEventListener {
         machines.clear();
         queues.clear();
         layoutService.setUpSimulation(machines, queues);
+
         startThreads();
     }
 
@@ -104,6 +108,7 @@ public class SimulationService implements SimulationEventListener {
 
         machines.values().forEach(machine->{
             Thread t = new Thread(machine);
+            System.out.println("thread started");
             machineThreads.add(t);
             t.start();
         });

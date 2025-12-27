@@ -1,14 +1,23 @@
-import {Component, inject} from '@angular/core';
-import {SimulationService} from '../../services/simulation-service/simulation-service';
-import {SnapshotService} from '../../services/snapshot-service/snapshot-service';
+import { Component, inject } from '@angular/core';
+import { SimulationService } from '../../services/simulation-service/simulation-service';
+import { SnapshotService } from '../../services/snapshot-service/snapshot-service';
+import { CommonModule } from '@angular/common';
 import {
-  LucideAngularModule, Play, Pause, Square, RotateCcw,
-  Save, History, Plus, ChevronLeft, ChevronRight
+  LucideAngularModule,
+  Play,
+  Pause,
+  Square,
+  RotateCcw,
+  Save,
+  History,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-angular';
 
 @Component({
   selector: 'app-top-bar',
-  imports: [LucideAngularModule],
+  imports: [LucideAngularModule, CommonModule],
   templateUrl: './top-bar.html',
   styleUrl: './top-bar.css',
 })
@@ -17,9 +26,15 @@ export class TopBar {
   private snapshotService = inject(SnapshotService);
 
   // Icon Mappings
-  readonly Play = Play; readonly Pause = Pause; readonly Square = Square;
-  readonly RotateCcw = RotateCcw; readonly Save = Save; readonly History = History;
-  readonly Plus = Plus; readonly ChevronLeft = ChevronLeft; readonly ChevronRight = ChevronRight;
+  readonly Play = Play;
+  readonly Pause = Pause;
+  readonly Square = Square;
+  readonly RotateCcw = RotateCcw;
+  readonly Save = Save;
+  readonly History = History;
+  readonly Plus = Plus;
+  readonly ChevronLeft = ChevronLeft;
+  readonly ChevronRight = ChevronRight;
 
   // Expose snapshot signals to template
   public snapshots = this.snapshotService.history;
@@ -45,7 +60,7 @@ export class TopBar {
     const currentState = {
       machines: this.simService.machines(),
       queues: this.simService.queues(),
-      connections: this.simService.connections()
+      connections: this.simService.connections(),
     };
     this.snapshotService.takeSnapshot(currentState);
   }
@@ -57,4 +72,6 @@ export class TopBar {
   handleAddProducts() {
     // TODO: Logic to trigger random product arrival at Q0
   }
+
+  resetLayout() {}
 }
