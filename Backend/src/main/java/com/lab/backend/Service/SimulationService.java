@@ -52,6 +52,7 @@ public class SimulationService implements SimulationEventListener {
         layoutService.setLocked(false);
         layoutService.reset();
         clearSimulationData();
+        this.running = false;
     }
 
     // when the user replay the last simulation
@@ -137,7 +138,10 @@ public class SimulationService implements SimulationEventListener {
         machineThreads.forEach(Thread::interrupt);
         machineThreads.clear();
         currentProductCount = 0;
-        producer.interrupt();
+
+        // producer is only created when the user starts the simulation
+        // without this condition we get a null pointer exception when we reset the canvas without starting the simulation
+        if (producer != null) producer.interrupt();
     }
 
     public synchronized void takeSnapshot() {

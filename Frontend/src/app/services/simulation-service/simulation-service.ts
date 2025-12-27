@@ -1,6 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { KonvaService } from '../konva-service/konva-service';
 import { SnapshotService } from '../snapshot-service/snapshot-service';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class SimulationService {
@@ -9,7 +10,8 @@ export class SimulationService {
    */
 
   private snapshot = inject(SnapshotService);
-  // private drawing = inject(KonvaService);
+  private http: HttpClient = inject(HttpClient);
+  private konvaService = inject(KonvaService);
 
   // Private signals to ensure that no one can edit them from outside
   private _machines = signal<any[]>([]);
@@ -24,6 +26,8 @@ export class SimulationService {
   public connections = this._connections.asReadonly();
   public editMode = this._editMode.asReadonly();
   public status = this._status.asReadonly();
+
+  private readonly API_BASE = 'http://localhost:8080/simulation';
 
   // Derived state for the Sidebar stats
   public totalProducts = computed(() =>
@@ -44,7 +48,7 @@ export class SimulationService {
   // Coordination logic
   start() {
     this._status.set('running');
-    // Call backend to start Java threads [cite: 32]
+
   }
 
   pause() {
@@ -56,11 +60,24 @@ export class SimulationService {
   }
 
   reset() {
-    this._machines.set([]);
-    this._queues.set([]);
-    this._connections.set([]);
-    this._status.set('stopped');
-    // this.refreshUI();
+
+    // This /reset call in the backend resets both the layout and the simulation
+    this.http.post(`${this.API_BASE}/reset`,{}, { responseType: 'text' }).subscribe(
+      {
+        next: (data) => {
+          this._machines.set([]);
+          this._queues.set([]);
+          this._connections.set([]);
+          this._status.set('stopped');
+          this.konvaService.clear();
+          console.log("Succefully reset simulation and canvas")
+        },
+        error: (err) => {
+          console.error("Failed to reset canvas.");
+          console.error(err);
+        }
+      }
+    );
   }
 
   handleReplay(index: number) {
