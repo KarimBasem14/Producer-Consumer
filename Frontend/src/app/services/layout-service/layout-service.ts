@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { KonvaService } from '../konva-service/konva-service';
 import { SignalZero } from 'lucide-angular';
@@ -26,6 +26,7 @@ export class LayoutService {
   private machineCounter = 0;
   private queueCounter = 0;
   private connectionCounter = 0;
+  public numberOfProducts = signal<number>(0);
 
   private connectionIdMap: Record<number, string> = {};
 
@@ -47,6 +48,23 @@ export class LayoutService {
       },
       error: (err) => console.error('Failed to add machine', err),
     });
+  }
+
+  incProductsNumber() {
+    this.numberOfProducts.update((val) => val + 1);
+    this.http
+      .post<number>(`${this.API_BASE}/products/add/${this.numberOfProducts()}`, {})
+      .subscribe({
+        next: (response) => {
+          if (response) {
+            this.numberOfProducts.set(response as number);
+          }
+          console.log('Number of products incremented:', this.numberOfProducts);
+        },
+        error: (err) => {
+          console.error('Failed to increment products number:', err);
+        },
+      });
   }
 
   addQueue() {

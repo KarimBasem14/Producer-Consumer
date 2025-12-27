@@ -40,10 +40,19 @@
     <button
       (click)="replaySimulation()"
       class="control-btn replay-btn"
-      [disabled]="simService.status() === 'running'"
+      [disabled]="simService.status() === 'running' || !simService.prevSimulationExists()"
     >
       <lucide-icon [name]="History" size="16"></lucide-icon>
       <span>Replay</span>
+    </button>
+
+    <button
+      (click)="handleAddProducts()"
+      class="control-btn control-btn-primary"
+      [disabled]="simService.status() === 'running'"
+    >
+      <lucide-icon [name]="Plus" size="16"></lucide-icon>
+      <span>Add Products</span>
     </button>
   </div>
 

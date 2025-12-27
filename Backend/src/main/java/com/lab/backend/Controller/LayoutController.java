@@ -16,10 +16,9 @@ public class LayoutController {
     @Autowired
     private LayoutService layoutService;
 
-    @PostMapping("/products/add")
-    public ResponseEntity<Integer> addQueue(@RequestBody int number) {
-        int num = layoutService.setProductsNumber(number);
-        return ResponseEntity.ok(num);
+    @PostMapping("/products/add/{number}")
+    public ResponseEntity<Integer> addProducts(@PathVariable int number) {
+        return ResponseEntity.ok(layoutService.setProductsNumber(number));
     }
 
     // queues
