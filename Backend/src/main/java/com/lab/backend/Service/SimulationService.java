@@ -84,7 +84,7 @@ public class SimulationService implements SimulationEventListener {
         // mapping machines to a map of product id and color
         // if the machine product is null the default machine color is white
         for (Map.Entry<Long, Machine> m : machines.entrySet()) {
-            if(m.getValue().getCurrentProduct()!=null)
+            if(m.getValue().getCurrentProduct()!=null && m.getValue().getCurrentProduct().getColor()!=null  )
                 uiStateDTO.machinesColor.put(m.getKey(), m.getValue().getCurrentProduct().getColor());
             else uiStateDTO.machinesColor.put(m.getKey(), "white");
         }

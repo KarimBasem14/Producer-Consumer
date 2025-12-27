@@ -39,17 +39,9 @@ export class KonvaService {
 
     const circle = new Konva.Circle({
       radius: 35,
-      fillRadialGradientStartPoint: { x: -10, y: -10 },
-      fillRadialGradientStartRadius: 0,
-      fillRadialGradientEndPoint: { x: -10, y: -10 },
-      fillRadialGradientEndRadius: 60,
-      fillRadialGradientColorStops: [0, 'white', 1, dto.color || '#f0f0f0'],
+      fill: dto.color || '#f0f0f0',
       stroke: '#444',
       strokeWidth: 2,
-      shadowColor: 'black',
-      shadowBlur: 10,
-      shadowOffset: { x: 5, y: 5 },
-      shadowOpacity: 0.2,
     });
 
     const label = new Konva.Text({
@@ -73,7 +65,7 @@ export class KonvaService {
 
     group.add(circle, label);
     this.layer.add(group);
-    this.layer.draw();
+    this.layer.batchDraw();
   }
 
   drawQueue(dto: any, counter: number) {
@@ -91,15 +83,9 @@ export class KonvaService {
       width: 70,
       height: 50,
       cornerRadius: 8,
-      fillLinearGradientStartPoint: { x: 0, y: 0 },
-      fillLinearGradientEndPoint: { x: 0, y: 50 },
-      fillLinearGradientColorStops: [0, '#3b82f6', 1, '#1d4ed8'],
+      fill: '#3b82f6',
       stroke: '#1e40af',
       strokeWidth: 2,
-      shadowColor: 'black',
-      shadowBlur: 8,
-      shadowOffset: { x: 3, y: 3 },
-      shadowOpacity: 0.3,
     });
 
     const text = new Konva.Text({
@@ -123,7 +109,7 @@ export class KonvaService {
     });
 
     this.layer.add(group);
-    this.layer.draw();
+    this.layer.batchDraw();
   }
   drawConnection(
     backendId: number,
@@ -178,12 +164,12 @@ export class KonvaService {
     toNode.on('dragmove', updatePoints);
 
     this.layer.add(arrow);
-    this.layer.draw();
+    this.layer.batchDraw();
   }
 
   clear() {
     this.layer.destroyChildren();
-    this.layer.draw();
+    this.layer.batchDraw();
   }
 
   /// Helpers
@@ -242,7 +228,7 @@ export class KonvaService {
     if (!node) return;
 
     node.destroy();
-    this.layer.draw();
+    this.layer.batchDraw();
   }
 
   updateMachineColor(machineId: number, newColor: string) {
@@ -255,9 +241,8 @@ export class KonvaService {
       const circle = group.findOne('Circle') as Konva.Circle;
 
       if (circle) {
-        // update color
-        // keep 'white' at 0 and update the end color at 1
-        circle.fillRadialGradientColorStops([0, 'white', 1, newColor]);
+        // update color with simple fill
+        circle.fill(newColor);
 
         // redraw
         this.layer.batchDraw();
