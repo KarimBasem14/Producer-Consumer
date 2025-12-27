@@ -56,14 +56,7 @@ export class TopBar {
     this.simService.reset();
   }
 
-  saveSnapshot() {
-    const currentState = {
-      machines: this.simService.machines(),
-      queues: this.simService.queues(),
-      connections: this.simService.connections(),
-    };
-    this.snapshotService.takeSnapshot(currentState);
-  }
+  replaySimulation() {}
 
   loadSnapshot(index: number) {
     this.simService.handleReplay(index);

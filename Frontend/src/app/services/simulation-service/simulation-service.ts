@@ -23,6 +23,7 @@ export class SimulationService {
   private _connections = signal<Connection[]>([]);
   private _editMode = signal<'select' | 'connect' | 'delete'>('select');
   private _status = signal<'running' | 'paused' | 'stopped'>('stopped');
+  public prevSimulationExists = signal<boolean>(false);
 
   // Read-only signals for the UI
   public machines = this._machines.asReadonly();
@@ -98,6 +99,7 @@ export class SimulationService {
   // Coordination logic
   start() {
     this._status.set('running');
+    this.prevSimulationExists.set(true);
     this.http.post(`${this.API_BASE}/start`, {}, { responseType: 'text' }).subscribe({
       next: (response) => {
         console.log('Simulation started:', response);
@@ -131,7 +133,7 @@ export class SimulationService {
         this._connections.set([]);
         this._status.set('stopped');
         this.konvaService.clear();
-        console.log('Succefully reset simulation and canvas');
+        console.log('Successfully reset simulation and canvas');
       },
       error: (err) => {
         console.error('Failed to reset canvas.');
