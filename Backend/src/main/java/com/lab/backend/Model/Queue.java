@@ -33,6 +33,11 @@ public class Queue implements Subject {
         if (products.isEmpty()) {
             return null;
         }
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         return products.removeFirst();
     }
 

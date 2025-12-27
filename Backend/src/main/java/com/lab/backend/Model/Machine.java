@@ -42,6 +42,11 @@ public class Machine implements Runnable, Observer {
         while (running) {
             Product product = fetchNextProduct();
             if (product != null) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
                 setCurrentProduct(product);
                 stateChanged();
                 unregisterFromAllInQueues();

@@ -149,7 +149,7 @@ public class SimulationService implements SimulationEventListener {
         while (currentProductCount < maxProducts && running && !Thread.currentThread().isInterrupted()) {
             try {
                 int min = 1;
-                int max = 5;
+                int max = 3;
                 int randomTime = (int)Math.floor(Math.random() *(max - min + 1) + min);
                 long delay = (long)(randomTime * 1000 / speedMultiplier);
                 Thread.sleep(delay);
