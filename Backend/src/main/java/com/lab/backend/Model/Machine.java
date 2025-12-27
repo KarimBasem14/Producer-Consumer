@@ -32,6 +32,11 @@ public class Machine implements Runnable, Observer {
         inputQueues.add(inputQueue);
     }
 
+    public boolean isReady() {
+        return outputQueue != null && !inputQueues.isEmpty();
+    }
+
+
     @Override
     public void run() {
         while (running) {
