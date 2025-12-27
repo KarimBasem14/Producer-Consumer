@@ -71,6 +71,8 @@ export class SimulationService {
     this.pollingInterval = setInterval(() => {
       this.http.get<UIStateDTO>(`${this.API_BASE}/state`).subscribe({
         next: (state) => {
+          console.log(state);
+
           this._queues.update((queues) => {
             return queues.map((q) => {
               const newSize = state.queuesSize[q.id];
