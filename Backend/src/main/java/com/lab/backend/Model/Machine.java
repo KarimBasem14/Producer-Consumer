@@ -49,6 +49,12 @@ public class Machine implements Runnable, Observer {
                 outputQueue.addProduct(product);
                 setCurrentProduct(null);
                 stateChanged();
+                try {
+                    Thread.sleep(210);
+                }
+                catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
             else {
                 registerToAllInQueues();

@@ -266,4 +266,35 @@ export class KonvaService {
       }
     }
   }
+
+  flashMachine(machineId: number) {
+  const group = this.stage.findOne(`#machine-${machineId}`) as Konva.Group;
+  if (!group) return;
+
+  const circle = group.findOne('Circle') as Konva.Circle;
+  if (!circle) return;
+
+  const overlay = new Konva.Circle({
+    x: 0,
+    y: 0,
+    radius: circle.radius() + 15,
+    fill: 'rgba(255,255,0,0.25)',
+    listening: false,
+  });
+
+  group.add(overlay);
+  this.layer.batchDraw();
+
+  // glow
+  circle.shadowColor('yellow');
+  circle.shadowBlur(20);
+  circle.shadowOpacity(0.7);
+
+  setTimeout(() => {
+    overlay.destroy();
+    circle.shadowOpacity(0);
+    this.layer.batchDraw();
+  }, 300);
+}
+
 }

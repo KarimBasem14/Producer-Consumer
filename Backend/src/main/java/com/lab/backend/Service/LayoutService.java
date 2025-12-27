@@ -203,8 +203,8 @@ public class LayoutService {
     }
 
     private int getRandomServiceTime() {
-        int min = 3;
-        int max = 8;
+        int min = 2;
+        int max = 4;
         return (int)Math.floor(Math.random() *(max - min + 1) + min);
     }
 
