@@ -39,7 +39,11 @@
     <div class="button-list">
       @let mode = editMode();
 
-      <button (click)="onSetMode('select')" [class.active]="editMode() === 'select'" class="sidebar-item">
+      <button
+        (click)="onSetMode('select')"
+        [class.active]="editMode() === 'select'"
+        class="sidebar-item"
+      >
         <lucide-icon [name]="HandGrab" size="16"></lucide-icon>
         <span>Select & Move</span>
       </button>
@@ -77,7 +81,7 @@
       </div>
       <div class="stat-row">
         <span>Products</span>
-        <span>{{ totalProducts() }}</span>
+        <!-- <span>{{ totalProducts() }}</span> -->
       </div>
     </div>
   </div>
