@@ -69,6 +69,12 @@ public class SimulationService implements SimulationEventListener {
     // when the user replay the last simulation
     public void replay() throws InterruptedException {
         stop();
+
+        machines.clear();
+        queues.clear();
+
+        // Recreate the exact same layout
+        layoutService.setUpSimulation(machines, queues);
         List<SimulationState> history = snapshotManager.getAll();
 
         for (int i = 0; i < history.size(); i++) {
