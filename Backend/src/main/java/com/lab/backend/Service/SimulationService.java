@@ -10,10 +10,7 @@ import com.lab.backend.snapshot.SimulationState;
 import com.lab.backend.snapshot.SnapshotManager;
 
 import javax.xml.stream.events.EntityReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Slf4j
@@ -21,6 +18,8 @@ import java.util.Map;
 public class SimulationService implements SimulationEventListener {
     private Map<Long, Machine> machines = new HashMap<>();
     private Map<Long, Queue> queues = new HashMap<>();
+    private Set<Queue> inputQueues = new HashSet<>();
+    private Set<Queue> outputQueues = new HashSet<>();
     List<Thread> machineThreads = new ArrayList<Thread>();
     Thread producer;
     boolean running = false;
@@ -56,6 +55,7 @@ public class SimulationService implements SimulationEventListener {
         machines.clear();
         queues.clear();
         maxProducts = layoutService.setUpSimulation(machines, queues);
+        analyzeQueueTopology();
         maxProducts = 5;
         takeSnapshot();
 
@@ -141,16 +141,24 @@ public class SimulationService implements SimulationEventListener {
                 .allMatch(m -> m.getCurrentProduct() == null);
         
         // Find the highest queue ID (assumed to be output)
-        Long maxQueueId = queues.keySet().stream()
-                .max(Long::compareTo)
-                .orElse(1L);
+//        Long maxQueueId = queues.keySet().stream()
+//                .max(Long::compareTo)
+//                .orElse(1L);
+
+        boolean allNonOutputQueuesEmpty = queues.values().stream()
+                .filter(q -> !outputQueues.contains(q))
+                .allMatch(q -> q.getProducts().isEmpty());
+
+//        // Check all queues except the max (output) are empty
+//        boolean allInputQueuesEmpty = queues.entrySet().stream()
+//                .filter(entry -> !entry.getKey().equals(maxQueueId))
+//                .allMatch(entry -> entry.getValue().getProducts().isEmpty());
         
-        // Check all queues except the max (output) are empty
-        boolean allInputQueuesEmpty = queues.entrySet().stream()
-                .filter(entry -> !entry.getKey().equals(maxQueueId))
-                .allMatch(entry -> entry.getValue().getProducts().isEmpty());
-        
-        uiStateDTO.isFinished = running && allProductsGenerated && allMachinesIdle && allInputQueuesEmpty || replayFinished;;
+        uiStateDTO.isFinished = running
+                                && allProductsGenerated
+                                && allMachinesIdle
+                                && allNonOutputQueuesEmpty
+                                || replayFinished;;
 
         if (uiStateDTO.isFinished) {
             System.out.println("🎉 SIMULATION MARKED AS FINISHED!");
@@ -192,6 +200,37 @@ public class SimulationService implements SimulationEventListener {
         producer.interrupt();
     }
 
+    private void analyzeQueueTopology() {
+        Set<Queue> queuesUsedAsInput = new HashSet<>();
+        Set<Queue> queuesUsedAsOutput = new HashSet<>();
+
+        for (Machine m : machines.values()) {
+            // multiple input queues
+            queuesUsedAsInput.addAll(m.getInputQueues());
+
+            // single output queue
+            if (m.getOutputQueue() != null) {
+                queuesUsedAsOutput.add(m.getOutputQueue());
+            }
+        }
+
+        inputQueues.clear();
+        outputQueues.clear();
+
+        for (Queue q : queues.values()) {
+            if (!queuesUsedAsOutput.contains(q)) {
+                inputQueues.add(q);
+            }
+            if (!queuesUsedAsInput.contains(q)) {
+                outputQueues.add(q);
+            }
+        }
+
+        log.info("Detected input queues: {}", inputQueues.size());
+        log.info("Detected output queues: {}", outputQueues.size());
+    }
+
+
     private void generateProducts() {
         while (currentProductCount < maxProducts && running && !Thread.currentThread().isInterrupted()) {
             try {
@@ -200,13 +239,21 @@ public class SimulationService implements SimulationEventListener {
                 int randomTime = (int)Math.floor(Math.random() *(max - min + 1) + min);
                 long delay = (long)(randomTime * 1000 / speedMultiplier);
                 Thread.sleep(delay);
-                Product p = new Product((long)currentProductCount);
-                Queue q0 = queues.get(1L);
-                if (q0 != null) {
-                    q0.addProduct(p);
-                    currentProductCount++;
-                    takeSnapshot();
-                }
+                Product p = new Product((long)currentProductCount++);
+//                Queue q0 = queues.get(1L);
+//                if (q0 != null) {
+//                    q0.addProduct(p);
+//                    currentProductCount++;
+//                    takeSnapshot();
+//                }
+
+                Queue startQueue = inputQueues.iterator().next();
+                startQueue.addProduct(p);
+
+                takeSnapshot();
+
+
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

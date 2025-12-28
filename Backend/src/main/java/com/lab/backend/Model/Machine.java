@@ -9,8 +9,10 @@ import java.util.List;
 
 
 public class Machine implements Runnable, Observer {
+    @Getter
     private List<Queue> inputQueues = new ArrayList<>();
     @Setter
+    @Getter
     private Queue outputQueue;
     private int processingTime;
     private int currentQueueIndex = 0;
