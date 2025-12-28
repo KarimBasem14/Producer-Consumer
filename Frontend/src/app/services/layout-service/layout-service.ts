@@ -297,6 +297,7 @@ export class LayoutService {
         next: (data) => {
           this.konva.clear();
           this.simService.updateState([], [], []);
+          this.simService.prevSimulationExists.set(false); // Disable replay button
           this.machineOffset = 0;
           this.queueOffset = 0;
 

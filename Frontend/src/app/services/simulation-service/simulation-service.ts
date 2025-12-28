@@ -198,6 +198,7 @@ export class SimulationService {
         this._queues.set([]);
         this._connections.set([]);
         this._status.set('stopped');
+        this.prevSimulationExists.set(false); // Disable replay button
         this.konvaService.clear();
         console.log('Successfully reset simulation and canvas');
         this.toastr.success('Simulation reset successfully', 'Reset Complete');
