@@ -21,7 +21,7 @@ public class Machine implements Runnable, Observer {
 
     private final SimulationEventListener listener;
 
-    private boolean running = true;
+    private volatile boolean running = true;
 
     public Machine(int processingTime, SimulationEventListener listener) {
         this.processingTime = processingTime;
@@ -36,9 +36,19 @@ public class Machine implements Runnable, Observer {
         return outputQueue != null && !inputQueues.isEmpty();
     }
 
+    private void log(String msg) {
+        System.out.println(
+                "[Thread=" + Thread.currentThread().getName() +
+                        ", Machine@" + System.identityHashCode(this) + "] " + msg
+        );
+    }
+    public void shutdown() {
+        running = false;
+    }
 
     @Override
     public void run() {
+        log("RUN START");
         while (running) {
             Product product = fetchNextProduct();
             if (product != null) {

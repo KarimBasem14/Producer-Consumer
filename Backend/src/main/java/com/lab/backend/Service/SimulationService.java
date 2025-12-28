@@ -50,12 +50,13 @@ public class SimulationService implements SimulationEventListener {
     public void start() {
         clearSimulationData();
         replayFinished = false;
+        snapshotManager.clear();
         running = true;
         layoutService.setLocked(true);
         machines.clear();
         queues.clear();
         maxProducts = layoutService.setUpSimulation(machines, queues);
-
+        maxProducts = 5;
         takeSnapshot();
 
         startThreads();
@@ -74,12 +75,30 @@ public class SimulationService implements SimulationEventListener {
     // when the user replay the last simulation
     public void replay() throws InterruptedException {
         stop();
+        System.out.println("===== REPLAY START =====");
+
+        Thread.getAllStackTraces().keySet().forEach(t ->
+                System.out.println(
+                        "Thread: " + t.getName() +
+                                ", alive=" + t.isAlive()
+                )
+        );
+
         replayFinished = false;
         machines.clear();
         queues.clear();
 
         // Recreate the exact same layout
         layoutService.setUpSimulation(machines, queues);
+        System.out.println("===== after set up =====");
+
+        Thread.getAllStackTraces().keySet().forEach(t ->
+                System.out.println(
+                        "Thread: " + t.getName() +
+                                ", alive=" + t.isAlive()
+                )
+        );
+
         List<SimulationState> history = snapshotManager.getAll();
 
         for (int i = 0; i < history.size(); i++) {
@@ -153,19 +172,24 @@ public class SimulationService implements SimulationEventListener {
 
         machines.values().forEach(machine->{
             Thread t = new Thread(machine);
-            System.out.println("thread started");
+            t.setName("Machine@" + System.identityHashCode(machine));
             machineThreads.add(t);
             t.start();
         });
 
         producer = new Thread(this::generateProducts);
+        producer.setName("Producer@" + System.identityHashCode(producer));
         producer.start();
     }
 
     private void stop() {
         this.running = false;
+        machines.values().forEach(Machine::shutdown);
         machineThreads.forEach(Thread::interrupt);
         machineThreads.clear();
+        if (producer != null) {
+            producer.interrupt();
+        }
         layoutService.setLocked(false);
         producer.interrupt();
     }
@@ -209,9 +233,11 @@ public class SimulationService implements SimulationEventListener {
 
         queues.forEach((id, q) ->
                 qSnap.put(id, q.snapshotProducts()));
+        System.out.printf("queue taken");
 
         machines.forEach((id, m) ->
                 mSnap.put(id, m.getCurrentProduct()));
+        System.out.println("machines taken");
 
         snapshotManager.save(
                 new SimulationState(System.currentTimeMillis(), qSnap, mSnap)
@@ -227,6 +253,10 @@ public class SimulationService implements SimulationEventListener {
         state.getMachineStates().forEach((id, product) -> {
             Machine m = machines.get(id);
             m.setCurrentProduct(product);
+            if (product != null) {
+                System.out.println(product.getColor());
+
+            }
         });
 
     }
