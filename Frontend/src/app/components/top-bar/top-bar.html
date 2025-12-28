@@ -9,7 +9,8 @@
       </button>
 
       }
-      <button (click)="resetSimulation()" class="control-btn control-btn-secondary" [disabled]="simService.queues().length === 0 || simService.machines().length === 0">
+      <button (click)="resetSimulation()" class="control-btn control-btn-secondary"
+        [disabled]="simService.queues().length === 0 || simService.machines().length === 0">
         <lucide-icon [name]="RotateCcw" size="16"></lucide-icon>
         <span>Reset Simulation</span>
       </button>
@@ -19,7 +20,8 @@
         <lucide-icon [name]="Square" size="16"></lucide-icon>
         <span>Stop</span>
       </button>
-      <button (click)="resetLayout()" class="control-btn control-btn-danger" [disabled]="simService.queues().length != 0 || simService.machines().length != 0">
+      <button (click)="resetLayout()" class="control-btn control-btn-danger"
+        [disabled]="simService.status() === 'running' || (simService.queues().length === 0 && simService.machines().length === 0)">
         <lucide-icon [name]="RotateCcw" size="16"></lucide-icon>
         <span>Clear Canvas</span>
       </button>

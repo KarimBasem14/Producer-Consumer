@@ -7,6 +7,7 @@ import { Connection } from '../../models/Connection.model';
 import Konva from 'konva';
 import { SimulationService } from '../simulation-service/simulation-service';
 import { Queue } from '../../models/Queue.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,7 @@ export class LayoutService {
   private http = inject(HttpClient);
   private konva = inject(KonvaService);
   private simService = inject(SimulationService);
+  private toastr = inject(ToastrService);
   private firstSelectedId: number | null = null;
   private firstSelectedType: 'machine' | 'queue' | 'connection' | null = null;
 
@@ -299,10 +301,12 @@ export class LayoutService {
           this.queueOffset = 0;
 
           console.log('Canvas cleared successfully');
+          this.toastr.success('Canvas cleared successfully', 'Clear Complete');
         },
         error: err => {
           console.error("Failed to clear canvas from layout service");
           console.error('Error details:', err);
+          this.toastr.error('Failed to clear canvas', 'Clear Failed');
         }
       }
     );

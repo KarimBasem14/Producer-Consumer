@@ -200,9 +200,11 @@ export class SimulationService {
         this._status.set('stopped');
         this.konvaService.clear();
         console.log('Successfully reset simulation and canvas');
+        this.toastr.success('Simulation reset successfully', 'Reset Complete');
       },
       error: (err) => {
         console.error('Failed to reset canvas.');
+        this.toastr.error('Failed to reset simulation', 'Reset Failed');
         console.error(err);
       },
     });
