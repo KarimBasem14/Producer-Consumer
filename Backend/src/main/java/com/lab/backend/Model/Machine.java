@@ -13,9 +13,11 @@ public class Machine implements Runnable, Observer {
     private List<Queue> inputQueues = new ArrayList<>();
     @Setter
     @Getter
-    private Queue outputQueue;
+    private List<Queue> outputQueues = new ArrayList<>();
+
     private int processingTime;
-    private int currentQueueIndex = 0;
+    private int currentInputIndex = 0;
+    private int currentOutputIndex = 0;
 
     @Setter
     @Getter
@@ -33,9 +35,12 @@ public class Machine implements Runnable, Observer {
     public void addToInputQueue(Queue inputQueue) {
         inputQueues.add(inputQueue);
     }
+    public void addToOutputQueue(Queue q) {
+        outputQueues.add(q);
+    }
 
     public boolean isReady() {
-        return outputQueue != null && !inputQueues.isEmpty();
+        return !outputQueues.isEmpty() && !inputQueues.isEmpty();
     }
 
     private void log(String msg) {
@@ -74,7 +79,8 @@ public class Machine implements Runnable, Observer {
                 stateChanged();
                 unregisterFromAllInQueues();
                 process(product);
-                outputQueue.addProduct(product);
+                Queue out = selectOutputQueue(product);
+                out.addProduct(product);
                 setCurrentProduct(null);
                 stateChanged();
                 try {
@@ -100,18 +106,21 @@ public class Machine implements Runnable, Observer {
 
     private Product fetchNextProduct() {
         for (int i = 0; i < inputQueues.size(); i++) {
-            Queue q = inputQueues.get(currentQueueIndex);
+            Queue q = inputQueues.get(currentInputIndex);
             Product product = q.pollProduct();
 
-            currentQueueIndex = (currentQueueIndex + 1) % inputQueues.size();
-
-
+            currentInputIndex = (currentInputIndex + 1) % inputQueues.size();
             if  (product != null) {
                 return product;
             }
 
         }
         return null;
+    }
+    private Queue selectOutputQueue(Product product) {
+        Queue q = outputQueues.get(currentOutputIndex);
+        currentOutputIndex = (currentOutputIndex + 1) % outputQueues.size();
+        return q;
     }
 
     private void process(Product product) {

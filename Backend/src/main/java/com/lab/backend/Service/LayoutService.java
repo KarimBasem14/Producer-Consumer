@@ -224,7 +224,7 @@ public class LayoutService {
             System.out.println("conn from q" + conn.getFromId() + " to q" + conn.getToId());
 
             if (source != null && target != null) {
-                source.setOutputQueue(target);
+                source.addToOutputQueue(target);
             }
         }
     }

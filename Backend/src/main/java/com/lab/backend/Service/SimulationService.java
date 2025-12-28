@@ -205,13 +205,8 @@ public class SimulationService implements SimulationEventListener {
         Set<Queue> queuesUsedAsOutput = new HashSet<>();
 
         for (Machine m : machines.values()) {
-            // multiple input queues
             queuesUsedAsInput.addAll(m.getInputQueues());
-
-            // single output queue
-            if (m.getOutputQueue() != null) {
-                queuesUsedAsOutput.add(m.getOutputQueue());
-            }
+            queuesUsedAsOutput.addAll(m.getOutputQueues());
         }
 
         inputQueues.clear();

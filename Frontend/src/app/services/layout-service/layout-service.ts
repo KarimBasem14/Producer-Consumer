@@ -22,9 +22,12 @@ export class LayoutService {
   private firstSelectedType: 'machine' | 'queue' | 'connection' | null = null;
 
   private readonly API_BASE = 'http://localhost:8080/layout';
-  private machineOffset = 0;
-  private queueOffset = 0;
-  private readonly SHIFT_STEP = 40;
+  private diagX = 100;
+  private diagY = 100;
+
+  private readonly DIAG_STEP = 40; // how far each new item moves
+  private readonly DIAG_MAX = 400; // when to reset (prevents going off-canvas)
+
   private machineCounter = 0;
   private queueCounter = 0;
   private connectionCounter = 0;
@@ -32,10 +35,26 @@ export class LayoutService {
 
   private connectionIdMap: Record<number, string> = {};
 
+  private getDiagonalPosition() {
+    const pos = { x: this.diagX, y: this.diagY };
+
+    this.diagX += this.DIAG_STEP;
+    this.diagY += this.DIAG_STEP;
+
+    // Prevent drifting too far
+    if (this.diagX > this.DIAG_MAX || this.diagY > this.DIAG_MAX) {
+      this.diagX = 100;
+      this.diagY = 100;
+    }
+
+    return pos;
+  }
+
   addMachine() {
+    const pos = this.getDiagonalPosition();
     const initialData = {
-      x: 100 + this.machineOffset,
-      y: 100 + this.machineOffset,
+      x: pos.x,
+      y: pos.y,
       color: 'white',
     };
 
@@ -44,8 +63,6 @@ export class LayoutService {
         this.konva.drawMachine(savedMachine, this.machineCounter);
 
         this.simService.addComponent('machine', savedMachine); // update global state
-
-        this.machineOffset += this.SHIFT_STEP;
         this.machineCounter++;
       },
       error: (err) => console.error('Failed to add machine', err),
@@ -70,9 +87,10 @@ export class LayoutService {
   }
 
   addQueue() {
+    const pos = this.getDiagonalPosition();
     const initialData = {
-      x: 300 + this.queueOffset,
-      y: 100 + this.queueOffset,
+      x: pos.x,
+      y: pos.y,
       size: 0,
     };
 
@@ -80,7 +98,6 @@ export class LayoutService {
       next: (savedQueue) => {
         this.konva.drawQueue(savedQueue, this.queueCounter);
         this.simService.addComponent('queue', savedQueue); // Add this line!
-        this.queueOffset += this.SHIFT_STEP;
         this.queueCounter++;
       },
       error: (err) => console.error('Failed to add queue', err),
@@ -153,12 +170,12 @@ export class LayoutService {
         return;
       }
 
-      if (sourceType === 'machine') {
-        if (this.machineHasConnection(sourceId)) {
-          console.log(`Machine ${sourceId} is already connected to a queue.`);
-          return;
-        }
-      }
+      // if (sourceType === 'machine') {
+      //   if (this.machineHasConnection(sourceId)) {
+      //     console.log(`Machine ${sourceId} is already connected to a queue.`);
+      //     return;
+      //   }
+      // }
 
       if (sourceType === targetType) {
         console.log('Cannot connect two components of the same type.');
@@ -292,24 +309,22 @@ export class LayoutService {
   }
 
   clearAll() {
-    this.http.delete(`${this.API_BASE}/clear`, { responseType: 'text' }).subscribe(
-      {
-        next: (data) => {
-          this.konva.clear();
-          this.simService.updateState([], [], []);
-          this.simService.prevSimulationExists.set(false); // Disable replay button
-          this.machineOffset = 0;
-          this.queueOffset = 0;
+    this.http.delete(`${this.API_BASE}/clear`, { responseType: 'text' }).subscribe({
+      next: (data) => {
+        this.konva.clear();
+        this.simService.updateState([], [], []);
+        this.simService.prevSimulationExists.set(false); // Disable replay button
+        this.diagX = 100;
+        this.diagY = 100;
 
-          console.log('Canvas cleared successfully');
-          this.toastr.success('Canvas cleared successfully', 'Clear Complete');
-        },
-        error: err => {
-          console.error("Failed to clear canvas from layout service");
-          console.error('Error details:', err);
-          this.toastr.error('Failed to clear canvas', 'Clear Failed');
-        }
-      }
-    );
+        console.log('Canvas cleared successfully');
+        this.toastr.success('Canvas cleared successfully', 'Clear Complete');
+      },
+      error: (err) => {
+        console.error('Failed to clear canvas from layout service');
+        console.error('Error details:', err);
+        this.toastr.error('Failed to clear canvas', 'Clear Failed');
+      },
+    });
   }
 }

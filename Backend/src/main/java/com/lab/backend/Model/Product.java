@@ -1,7 +1,9 @@
 package com.lab.backend.Model;
 
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 public class Product {
     private final Long id;
