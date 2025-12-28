@@ -26,7 +26,9 @@ public class SimulationService implements SimulationEventListener {
     boolean running = false;
     private int maxProducts = 20;
     private int currentProductCount = 0;
-    
+    private volatile boolean replayFinished = false;
+
+
     // Static speed multiplier accessible by Machine threads
     public static double speedMultiplier = 1.0;
 
@@ -47,12 +49,14 @@ public class SimulationService implements SimulationEventListener {
     // called by the controller when starting the simulation
     public void start() {
         clearSimulationData();
-
+        replayFinished = false;
         running = true;
         layoutService.setLocked(true);
         machines.clear();
         queues.clear();
         maxProducts = layoutService.setUpSimulation(machines, queues);
+
+        takeSnapshot();
 
         startThreads();
     }
@@ -62,6 +66,7 @@ public class SimulationService implements SimulationEventListener {
     public void resetSimulation(){
         layoutService.setLocked(false);
         layoutService.reset();
+        replayFinished = false;
         clearSimulationData();
         this.running = false;
     }
@@ -69,7 +74,7 @@ public class SimulationService implements SimulationEventListener {
     // when the user replay the last simulation
     public void replay() throws InterruptedException {
         stop();
-
+        replayFinished = false;
         machines.clear();
         queues.clear();
 
@@ -88,6 +93,7 @@ public class SimulationService implements SimulationEventListener {
                 Thread.sleep(delay);
             }
         }
+        replayFinished = true;
     }
 
     // getting the current state (polling every 200ms) to update the UI
@@ -127,7 +133,7 @@ public class SimulationService implements SimulationEventListener {
                 .filter(entry -> !entry.getKey().equals(maxQueueId))
                 .allMatch(entry -> entry.getValue().getProducts().isEmpty());
         
-        uiStateDTO.isFinished = running && allProductsGenerated && allMachinesIdle && allInputQueuesEmpty;
+        uiStateDTO.isFinished = running && allProductsGenerated && allMachinesIdle && allInputQueuesEmpty || replayFinished;;
 
         if (uiStateDTO.isFinished) {
             System.out.println("🎉 SIMULATION MARKED AS FINISHED!");
