@@ -290,10 +290,21 @@ export class LayoutService {
   }
 
   clearAll() {
-    this.http.delete(`${this.API_BASE}/clear`).subscribe(() => {
-      this.konva.clear();
-      this.machineOffset = 0;
-      this.queueOffset = 0;
-    });
+    this.http.delete(`${this.API_BASE}/clear`, { responseType: 'text' }).subscribe(
+      {
+        next: (data) => {
+          this.konva.clear();
+          this.simService.updateState([], [], []);
+          this.machineOffset = 0;
+          this.queueOffset = 0;
+
+          console.log('Canvas cleared successfully');
+        },
+        error: err => {
+          console.error("Failed to clear canvas from layout service");
+          console.error('Error details:', err);
+        }
+      }
+    );
   }
 }

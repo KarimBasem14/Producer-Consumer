@@ -209,37 +209,37 @@ export class SimulationService {
   }
 
   handleReplay() {
-if (!this.prevSimulationExists()) {
-    this.toastr.warning('No previous simulation to replay');
-    return;
-  }
+    if (!this.prevSimulationExists()) {
+      this.toastr.warning('No previous simulation to replay');
+      return;
+    }
 
-  // Stop any existing polling
-  if (this.pollingInterval) {
-    clearInterval(this.pollingInterval);
-    this.pollingInterval = undefined;
-  }
+    // Stop any existing polling
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = undefined;
+    }
 
-  this.konvaService.lock();
+    this.konvaService.lock();
 
-  this._status.set('running');
+    this._status.set('running');
 
-  // Reset last known colors flashhhhing
-  this.lastMachineColor.clear();
+    // Reset last known colors flashhhhing
+    this.lastMachineColor.clear();
 
-  this.startPolling();
+    this.startPolling();
 
-  this.http.post(`${this.API_BASE}/replay`, {}, { responseType: 'text' })
-    .subscribe({
-      next: (res) => {
-        console.log('Replay started:', res);
-      },
-      error: (err) => {
-        console.error('Replay failed', err);
-        this.toastr.error('Replay failed');
-        this._status.set('stopped');
-        this.konvaService.unlock();
-      }
-    });
+    this.http.post(`${this.API_BASE}/replay`, {}, { responseType: 'text' })
+      .subscribe({
+        next: (res) => {
+          console.log('Replay started:', res);
+        },
+        error: (err) => {
+          console.error('Replay failed', err);
+          this.toastr.error('Replay failed');
+          this._status.set('stopped');
+          this.konvaService.unlock();
+        }
+      });
   }
 }

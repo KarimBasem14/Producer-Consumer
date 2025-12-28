@@ -2,55 +2,38 @@
   <div class="control-group">
     <div class="button-strip">
       @if (simService.status() !== 'running') {
-      <button
-        (click)="startSimulation()"
-        class="control-btn control-btn-success"
-        [disabled]="simService.queues().length === 0 || simService.machines().length === 0"
-      >
+      <button (click)="startSimulation()" class="control-btn control-btn-success"
+        [disabled]="simService.queues().length === 0 || simService.machines().length === 0">
         <lucide-icon [name]="Play" size="16"></lucide-icon>
         <span>Start</span>
       </button>
       <button (click)="resetLayout()" class="control-btn control-btn-danger">
         <lucide-icon [name]="RotateCcw" size="16"></lucide-icon>
-        <span>Reset</span>
-      </button>
-      } @else {
-      <button (click)="pauseSimulation()" class="control-btn pause-btn">
-        <lucide-icon [name]="Pause" size="16"></lucide-icon>
-        <span>Pause</span>
+        <span>Clear Canvas</span>
       </button>
       }
 
-      <button
-        (click)="stopSimulation()"
-        class="control-btn control-btn-secondary"
-        [disabled]="simService.status() === 'stopped'"
-      >
+      <button (click)="stopSimulation()" class="control-btn control-btn-secondary"
+        [disabled]="simService.status() === 'stopped'">
         <lucide-icon [name]="Square" size="16"></lucide-icon>
         <span>Stop</span>
       </button>
 
       <button (click)="resetSimulation()" class="control-btn control-btn-secondary">
         <lucide-icon [name]="RotateCcw" size="16"></lucide-icon>
-        <span>Reset</span>
+        <span>Reset Simulation</span>
       </button>
     </div>
 
     <div class="divider"></div>
-    <button
-      (click)="replaySimulation()"
-      class="control-btn replay-btn"
-      [disabled]="simService.status() === 'running' || !simService.prevSimulationExists()"
-    >
+    <button (click)="replaySimulation()" class="control-btn replay-btn"
+      [disabled]="simService.status() === 'running' || !simService.prevSimulationExists()">
       <lucide-icon [name]="History" size="16"></lucide-icon>
       <span>Replay</span>
     </button>
 
-    <button
-      (click)="handleAddProducts()"
-      class="control-btn control-btn-primary"
-      [disabled]="simService.status() === 'running'"
-    >
+    <button (click)="handleAddProducts()" class="control-btn control-btn-primary"
+      [disabled]="simService.status() === 'running'">
       <lucide-icon [name]="Plus" size="16"></lucide-icon>
       <span>Add Products</span>
     </button>
