@@ -103,14 +103,12 @@ public class SimulationService implements SimulationEventListener {
 
         for (int i = 0; i < history.size(); i++) {
             restore(history.get(i));
-
-            if (i > 0) {
-                long delay =
-                        history.get(i).getTimestamp()
-                                - history.get(i - 1).getTimestamp();
-
+            if (i < history.size() - 1) {
+                long delay = history.get(i+1).getTimestamp()
+                        - history.get(i).getTimestamp();
                 Thread.sleep(delay);
             }
+
         }
         replayFinished = true;
     }
