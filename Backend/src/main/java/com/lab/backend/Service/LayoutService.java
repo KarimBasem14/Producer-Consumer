@@ -176,6 +176,7 @@ public class LayoutService {
         nextConnectionId = 1;
         nextQueueId = 1;
         nextMachineId = 1;
+        this.productsNumber = 20;
     }
 
     public int setUpSimulation(Map<Long, Machine> machinesModels, Map<Long, Queue> queuesModels){

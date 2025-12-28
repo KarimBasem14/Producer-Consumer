@@ -29,6 +29,10 @@ export class SimulationService {
   public prevSimulationExists = signal<boolean>(false);
   private _speed = signal<number>(1);
 
+  public numberOfProducts = signal<number>(0); 
+  public readonly DEFAULT_PRODUCTS = 20; // default when user doesn't add manually
+  public manualProducts = signal<boolean>(false); 
+
   // Read-only signals for the UI
   public machines = this._machines.asReadonly();
   public queues = this._queues.asReadonly();
@@ -154,11 +158,20 @@ export class SimulationService {
     console.log('Toast should be visible now');
   }
 
+  resetProducts() {
+    this.numberOfProducts.set(0);
+    this.manualProducts.set(false);
+  }
 
-
+setManualProducts(value: boolean) {
+    this.manualProducts.set(value);
+  }
 
   // Coordination logic
   start() {
+    if (!this.manualProducts()) {
+    this.numberOfProducts.set(this.DEFAULT_PRODUCTS);
+  }
     this._status.set('running');
     this.prevSimulationExists.set(true);
     this.lastMachineColor.clear();
@@ -200,6 +213,7 @@ export class SimulationService {
         this._status.set('stopped');
         this.prevSimulationExists.set(false); // Disable replay button
         this.konvaService.clear();
+        this.resetProducts();
         console.log('Successfully reset simulation and canvas');
         this.toastr.success('Simulation reset successfully', 'Reset Complete');
       },

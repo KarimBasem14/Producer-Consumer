@@ -31,7 +31,7 @@ export class LayoutService {
   private machineCounter = 0;
   private queueCounter = 0;
   private connectionCounter = 0;
-  public numberOfProducts = signal<number>(0);
+  public numberOfProducts = this.simService.numberOfProducts;
 
   private connectionIdMap: Record<number, string> = {};
 
@@ -70,6 +70,7 @@ export class LayoutService {
   }
 
   incProductsNumber() {
+    this.simService.setManualProducts(true);
     this.numberOfProducts.update((val) => val + 1);
     this.http
       .post<number>(`${this.API_BASE}/products/add/${this.numberOfProducts()}`, {})
@@ -316,7 +317,8 @@ export class LayoutService {
         this.simService.prevSimulationExists.set(false); // Disable replay button
         this.diagX = 100;
         this.diagY = 100;
-
+        this.numberOfProducts.set(0);
+this.simService.setManualProducts(false);
         console.log('Canvas cleared successfully');
         this.toastr.success('Canvas cleared successfully', 'Clear Complete');
       },

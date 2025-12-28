@@ -56,7 +56,6 @@ public class SimulationService implements SimulationEventListener {
         queues.clear();
         maxProducts = layoutService.setUpSimulation(machines, queues);
         analyzeQueueTopology();
-        maxProducts = 5;
         takeSnapshot();
 
         startThreads();

@@ -67,7 +67,7 @@ export class TopBar {
   // }
 
   handleAddProducts() {
-    // TODO: Logic to trigger random product arrival at Q0
+    this.layoutService.incProductsNumber();
   }
 
   resetLayout() {
